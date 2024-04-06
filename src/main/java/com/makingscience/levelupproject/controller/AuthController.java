@@ -1,10 +1,10 @@
 package com.makingscience.levelupproject.controller;
 
 import com.makingscience.levelupproject.facade.AuthFacade;
-import com.makingscience.levelupproject.model.token.AuthResponse;
 import com.makingscience.levelupproject.model.params.SendOtpParam;
 import com.makingscience.levelupproject.model.params.UserLoginParam;
 import com.makingscience.levelupproject.model.params.UserRegistrationParam;
+import com.makingscience.levelupproject.model.token.AuthResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +33,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> registration(@Valid @RequestBody UserRegistrationParam param) {
-        authFacade.register(param);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<AuthResponse> registration(@Valid @RequestBody UserRegistrationParam param) {
+        AuthResponse authResponse = authFacade.register(param);
+        return ResponseEntity.ok(authResponse);
     }
 
     @PostMapping("/login")

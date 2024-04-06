@@ -17,7 +17,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: mshas18@freeuni.edu.ge
-    password: angelozi0000
+    password: mn04r8mn04r8
     properties:
       mail:
         smtp:
@@ -28,4 +28,4 @@ spring:
 util:
   jwt:
     secret: cFy/DJh+eQW0dCLLWpygzauKN3EBWRDwLbpJUus0ffAvOyHay5+FQCEBlnq0Wqv5ZnC5IgW5xJe91+XSyLo/GkxYp8qRh0ayUZInsRbmhEOaGIydUh5QU8XPiOTU5wLIeK
-    expiration: 1000
+    expiration: 1000000

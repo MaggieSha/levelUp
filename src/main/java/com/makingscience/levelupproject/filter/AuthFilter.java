@@ -1,5 +1,6 @@
 package com.makingscience.levelupproject.filter;
 
+import com.makingscience.levelupproject.model.enums.UserStatus;
 import com.makingscience.levelupproject.utils.JwtUtils;
 import com.makingscience.levelupproject.model.entities.postgre.User;
 import com.makingscience.levelupproject.repository.UserRepository;
@@ -43,7 +44,7 @@ public class AuthFilter extends OncePerRequestFilter {
         }
 
         User user = userRepository
-                .getByEmail(jwtUtils.getAuthenticatedUserEmail(token))
+                .getByEmailAndStatus(jwtUtils.getAuthenticatedUserEmail(token), UserStatus.ACTIVE)
                 .orElse(null);
 
         UsernamePasswordAuthenticationToken

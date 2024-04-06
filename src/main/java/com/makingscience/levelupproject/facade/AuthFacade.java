@@ -13,6 +13,7 @@ import com.makingscience.levelupproject.model.token.AuthResponse;
 import com.makingscience.levelupproject.service.EmailService;
 import com.makingscience.levelupproject.service.UserOtpService;
 import com.makingscience.levelupproject.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,7 +42,7 @@ public class AuthFacade {
 
     public void sendSMS(SendOtpParam param) {
         OtpType smsType = param.getOtpType();
-        String rawCode  = randomCode();
+        String rawCode = randomCode();
         String finalCode = rawCode;
         if (smsType.equals(OtpType.LOGIN)) {
             Optional<User> userAccount = userService.getByEmail(param.getEmail());
@@ -56,28 +57,38 @@ public class AuthFacade {
             finalCode = passwordEncoder.encode(rawCode);
         }
 
+        if (smsType.equals(OtpType.REGISTRATION)) {
+            Optional<User> userAccount = userService.getByEmail(param.getEmail());
+            if (userAccount.isPresent()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account already exists for email: " + param.getEmail());
+            }
+        }
+
 
         Optional<UserOtp> userSMS = userOtpService.getByEmail(param.getEmail());
         if (userSMS.isPresent()) userOtpService.delete(userSMS.get());
 
 
-        UserOtp save = userOtpService.save(UserOtp.of(param,finalCode));
+        userOtpService.save(UserOtp.of(param, finalCode));
 
         System.out.println("Email service CODE = " + rawCode);
 
-        emailService.send(param.getEmail(),rawCode);
+        emailService.send(param.getEmail(), rawCode);
     }
 
-
-    public void register(UserRegistrationParam param) {
+    @Transactional
+    public AuthResponse register(UserRegistrationParam param) {
+        Optional<User> userAccount = userService.getByEmail(param.getEmail());
+        if (userAccount.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account already exists for email: " + param.getEmail());
+        }
         UserOtp userOtp = userOtpService.getByEmail(param.getEmail()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.PRECONDITION_REQUIRED, String.format("OTP not send on email %s ", param.getEmail()))
         );
         if (userOtp.getCode().equals(param.getCode())) {
             userOtpService.delete(userOtp);
-            User user = registerUser(param);
-            // login and return
-            return;
+            registerUser(param);
+            return jwtUtils.generateJwtToken(new org.springframework.security.core.userdetails.User(param.getEmail(), "", List.of(new SimpleGrantedAuthority(Role.USER.name()))));
         }
 
         throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Invalid OTP!");
@@ -108,7 +119,7 @@ public class AuthFacade {
         Authentication authenticate = authenticationManager
                 .authenticate(
                         new UsernamePasswordAuthenticationToken(
-                                param.getEmail(), param.getCode(),List.of(new SimpleGrantedAuthority(Role.USER.name()))
+                                param.getEmail(), param.getCode(), List.of(new SimpleGrantedAuthority(Role.USER.name()))
                         )
                 );
 
@@ -116,6 +127,7 @@ public class AuthFacade {
         return jwtUtils.generateJwtToken((org.springframework.security.core.userdetails.User) authenticate.getPrincipal());
 
     }
+
     public static String randomCode() {
         Random rnd = new Random();
         int number = rnd.nextInt(999999);
