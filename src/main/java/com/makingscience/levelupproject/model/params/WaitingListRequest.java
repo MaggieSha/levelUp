@@ -6,20 +6,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-
+import java.util.UUID;
 
 @NoArgsConstructor
 @Setter
 @Getter
-public class ReservationRequest {
-
-    private Long slotId;
+public class WaitingListRequest {
+    private UUID branchId;
 
     private LocalDate reservationDay;
 
     private ReservationRequestDetails reservationRequestDetails;
-
-
-
-
 }

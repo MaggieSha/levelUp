@@ -1,6 +1,7 @@
-package com.makingscience.levelupproject.facade;
+package com.makingscience.levelupproject.facade.routers;
 
 
+import com.makingscience.levelupproject.facade.interfaces.SlotFacade;
 import com.makingscience.levelupproject.model.SlotDTO;
 import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Branch;
@@ -79,12 +80,13 @@ public class SlotFacadeRouter {
            List<SlotDTO> dtos = slots.stream().map(slot -> SlotDTO.of(slot,getDetails(slot))).collect(Collectors.toList());
            return new PageImpl<>(dtos,pageable,slots.getTotalElements());
        }
-       return null;
-       //TODO:
+        Page<Slot> slots = chooseFacade(slotFilterParam.getBranchId()).filter(slotFilterParam,pageable);
+        List<SlotDTO> dtos = slots.stream().map(slot -> SlotDTO.of(slot,getDetails(slot))).collect(Collectors.toList());
+        return new PageImpl<>(dtos,pageable,slots.getTotalElements());
     }
 
     private SlotDetails getDetails(Slot slot) {
-        return chooseFacade(slot.getBranch().getId()).getDetails(slot.getSlotDetails());
+        return chooseFacade(slot.getBranch().getId()).toDetails(slot.getSlotDetails());
 
 
     }

@@ -10,7 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -33,5 +36,11 @@ public class SlotService {
 
     public Page<Slot> findByBranchId(UUID branchId, Pageable pageable) {
         return slotRepository.findByBranchIdAndStatus(branchId,SlotStatus.ACTIVE,pageable);
+    }
+
+
+    public Slot findByIdAndLock(Long id) {
+        return slotRepository.findByIdAndLock(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Slot not found by id " + id));
     }
 }

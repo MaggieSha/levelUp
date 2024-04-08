@@ -1,6 +1,6 @@
 package com.makingscience.levelupproject.controller;
 
-import com.makingscience.levelupproject.facade.SlotFacadeRouter;
+import com.makingscience.levelupproject.facade.routers.SlotFacadeRouter;
 import com.makingscience.levelupproject.model.SlotDTO;
 import com.makingscience.levelupproject.model.params.CreateSlotParam;
 import com.makingscience.levelupproject.model.params.SlotFilterParam;

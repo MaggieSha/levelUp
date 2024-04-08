@@ -1,11 +1,14 @@
-package com.makingscience.levelupproject.facade;
+package com.makingscience.levelupproject.facade.interfaces;
 
 import com.makingscience.levelupproject.model.SlotDTO;
 import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
 import com.makingscience.levelupproject.model.enums.Type;
 import com.makingscience.levelupproject.model.params.CreateSlotParam;
+import com.makingscience.levelupproject.model.params.SlotFilterParam;
 import com.makingscience.levelupproject.model.params.UpdateSlotParam;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface SlotFacade {
 
@@ -18,5 +21,7 @@ public interface SlotFacade {
 
     SlotDTO getById(Slot slot);
 
-    SlotDetails getDetails(String slotDetails);
+    SlotDetails toDetails(String slotDetails);
+
+    Page<Slot> filter(SlotFilterParam slotFilterParam, Pageable pageable);
 }

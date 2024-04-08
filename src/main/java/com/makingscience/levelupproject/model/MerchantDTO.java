@@ -18,7 +18,7 @@ public class MerchantDTO {
 
 
     private Long categoryId;
-
+    private String categoryName;
 
     private String name;
 
@@ -48,6 +48,7 @@ public class MerchantDTO {
         merchantDTO.setDocumentAddress(merchant.getDocumentAddress());
         merchantDTO.setStatus(merchant.getStatus());
         merchantDTO.setPhone(merchant.getPhone());
+        merchantDTO.setCategoryName(merchant.getCategory().getName());
         return merchantDTO;
     }
 }

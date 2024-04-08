@@ -1,5 +1,6 @@
-package com.makingscience.levelupproject.service;
+package com.makingscience.levelupproject.facade;
 
+import com.makingscience.levelupproject.facade.interfaces.ReservationFacade;
 import com.makingscience.levelupproject.model.ReservationDTO;
 import com.makingscience.levelupproject.model.entities.postgre.Reservation;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
@@ -8,7 +9,6 @@ import com.makingscience.levelupproject.model.enums.ReservationStatus;
 import com.makingscience.levelupproject.model.enums.Type;
 import com.makingscience.levelupproject.model.params.ReservationRequest;
 import com.makingscience.levelupproject.repository.SlotRepository;
-import com.makingscience.levelupproject.service.interfaces.ReservationService;
 import com.makingscience.levelupproject.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +21,12 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ReserveVisitService  implements ReservationService {
+public class ReserveVisitFacade implements ReservationFacade {
 
     private final JwtUtils jwtUtils;
     private final SlotRepository slotRepository;
     @Override
-    public ReservationDTO reserve(ReservationRequest param) {
+    public ReservationDTO add(ReservationRequest param) {
         User authenticatedUser = jwtUtils.getAuthenticatedUser();
 
         Slot slot = slotRepository.findByIdAndLock(param.getSlotId()).orElseThrow(
@@ -46,9 +46,16 @@ public class ReserveVisitService  implements ReservationService {
         return null;
     }
 
+
+
     @Override
     public Type getType() {
         return Type.SALON;
+    }
+
+    @Override
+    public void cancel(Reservation reservation) {
+
     }
 
 

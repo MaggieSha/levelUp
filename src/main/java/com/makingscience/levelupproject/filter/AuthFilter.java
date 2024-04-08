@@ -1,6 +1,7 @@
 package com.makingscience.levelupproject.filter;
 
 import com.makingscience.levelupproject.model.enums.UserStatus;
+import com.makingscience.levelupproject.model.token.JwtAuthenticationToken;
 import com.makingscience.levelupproject.utils.JwtUtils;
 import com.makingscience.levelupproject.model.entities.postgre.User;
 import com.makingscience.levelupproject.repository.UserRepository;
@@ -47,12 +48,10 @@ public class AuthFilter extends OncePerRequestFilter {
                 .getByEmailAndStatus(jwtUtils.getAuthenticatedUserEmail(token), UserStatus.ACTIVE)
                 .orElse(null);
 
-        UsernamePasswordAuthenticationToken
-                authentication = new UsernamePasswordAuthenticationToken(
-                user, null,
-                user == null ?
-                        List.of() : List.of(new SimpleGrantedAuthority(user.getRole().name()))
-        );
+        JwtAuthenticationToken authentication =
+                new JwtAuthenticationToken(user,null,user ==null ? List.of() : List.of(new SimpleGrantedAuthority(user.getRole().name())),token);
+
+
 
         authentication.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request)

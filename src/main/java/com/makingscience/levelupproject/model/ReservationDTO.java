@@ -1,6 +1,8 @@
 package com.makingscience.levelupproject.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.makingscience.levelupproject.model.details.reservation.ReservationDetails;
+import com.makingscience.levelupproject.model.details.reservation.RestaurantReservationDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Reservation;
 import com.makingscience.levelupproject.model.enums.ReservationStatus;
 import lombok.Getter;
@@ -30,9 +32,10 @@ public class ReservationDTO {
     private Integer duration;
 
     private ReservationStatus reservationStatus;
+    private  ReservationDetails reservationDetails;
 
 
-    public static ReservationDTO of(Reservation reservation) {
+    public static ReservationDTO of(Reservation reservation, ReservationDetails reservationDetails) {
         ReservationDTO dto = new ReservationDTO();
         dto.setId(reservation.getId());
         dto.setSlotId(reservation.getSlot().getId());
@@ -40,6 +43,7 @@ public class ReservationDTO {
         dto.setReservationDay(reservation.getReservationDay());
         dto.setReservationTime(reservation.getReservationTime());
         dto.setReservationStatus(reservation.getReservationStatus());
+        dto.setReservationDetails(reservationDetails);
         return dto;
     }
 }

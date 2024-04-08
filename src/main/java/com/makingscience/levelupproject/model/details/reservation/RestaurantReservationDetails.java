@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RestaurantReservationDetails {
+public class RestaurantReservationDetails implements ReservationDetails {
     private Integer numberOfPeople;
 }

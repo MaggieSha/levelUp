@@ -36,11 +36,12 @@ public class WaitingList {
     @Column(name = "preferred_time")
     private LocalTime preferredTime;
 
-    @Column(name = "guest_number")
-    private LocalTime guestNumber;
+
 
     @Column(name = "waiting_status")
     @Enumerated(EnumType.STRING)
     private WaitingStatus waitingStatus;
+
+    private String waitingListDetails;
 
 }
