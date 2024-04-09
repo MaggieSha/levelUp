@@ -1,11 +1,15 @@
 package com.makingscience.levelupproject.model.entities.postgre;
 
-import com.makingscience.levelupproject.model.enums.Type;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.enums.SlotStatus;
+import com.makingscience.levelupproject.utils.SlotDetailsConverter;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import java.util.Set;
 
@@ -14,6 +18,7 @@ import java.util.Set;
 @Setter
 @jakarta.persistence.Table(name = "slot")
 @RequiredArgsConstructor
+
 public class Slot {
 
     @Column(name = "id")
@@ -42,7 +47,8 @@ public class Slot {
     @OneToMany(mappedBy = "slot")
     private Set<Reservation> reservationSet;
 
-    @Column(name = "details")
+    @Type(JsonType.class)
+    @Column(name = "details",columnDefinition = "jsonb")
     private String slotDetails;
 
 

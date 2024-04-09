@@ -1,6 +1,7 @@
 package com.makingscience.levelupproject.service;
 
 
+import com.makingscience.levelupproject.model.MerchantDTO;
 import com.makingscience.levelupproject.model.entities.postgre.Merchant;
 import com.makingscience.levelupproject.model.enums.MerchantStatus;
 import com.makingscience.levelupproject.repository.MerchantRepository;
@@ -43,5 +44,9 @@ public class MerchantService {
 
     public Page<Merchant> getAllMerchantsByCategory(Pageable pageable, Long categoryId) {
         return merchantRepository.getAllMerchantsByCategory(pageable,categoryId,MerchantStatus.ACTIVE);
+    }
+
+    public Page<MerchantDTO> getAllMerchantByRating(Pageable pageable) {
+        return merchantRepository.getAllMerchantByRating(pageable);
     }
 }

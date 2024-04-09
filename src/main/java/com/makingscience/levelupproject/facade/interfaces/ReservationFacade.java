@@ -2,6 +2,7 @@ package com.makingscience.levelupproject.facade.interfaces;
 
 
 import com.makingscience.levelupproject.model.ReservationDTO;
+import com.makingscience.levelupproject.model.details.reservation.ReservationDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Reservation;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
 import com.makingscience.levelupproject.model.enums.Type;
@@ -16,5 +17,8 @@ public interface ReservationFacade {
     Type getType();
 
 
-    void cancel(Reservation reservation);
+    @Transactional
+    void cancel(Long reservationId);
+
+    ReservationDetails getDetails(Long id);
 }

@@ -58,7 +58,7 @@ public class CategoryFacade {
 
     public Page<CategoryDTO> getAll(Pageable pageable) {
         Page<Category> page = categoryService.getAll(pageable);
-        List<CategoryDTO> dtos = page.getContent().stream().map(category -> CategoryDTO.of(category)).collect(Collectors.toList());
+        List<CategoryDTO> dtos = page.getContent().stream().map(category -> CategoryDTO.toDTOWithCommission(category)).collect(Collectors.toList());
         return new PageImpl<>(dtos,pageable,page.getTotalElements());
     }
 }

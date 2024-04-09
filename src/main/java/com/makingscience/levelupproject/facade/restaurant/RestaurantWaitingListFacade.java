@@ -1,4 +1,4 @@
-package com.makingscience.levelupproject.facade;
+package com.makingscience.levelupproject.facade.restaurant;
 
 import com.makingscience.levelupproject.facade.interfaces.WaitingListFacade;
 import com.makingscience.levelupproject.model.WaitinListNotification;
@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -52,9 +53,12 @@ public class RestaurantWaitingListFacade implements WaitingListFacade {
         int preferredSlotsNumber = 0;
         for (Slot slot : slots) {
             RestaurantSlotDetails slotDetails = toSlotDetails(slot.getSlotDetails());
+
             if (requestDetails.getNumberOfPeople() > slotDetails.getTableCapacity() ||
                     (requestDetails.getPreferredTime().isBefore(slotDetails.getReservationStartTime()) ||
+
                             requestDetails.getPreferredTime().isAfter(slotDetails.getReservationEndTime()))) continue;
+
             preferredSlotsNumber++;
 
             List<Reservation> reservations = reservationService.getByStatusAndReservationDay(List.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED, ReservationStatus.CHECKED_IN), param.getReservationDay());
@@ -108,10 +112,10 @@ public class RestaurantWaitingListFacade implements WaitingListFacade {
         return details;
     }
 
-    public RestaurantReservationDetails toReservationDetails(String slotDetails) {
-        RestaurantReservationDetails details;
+    public RestaurantReservationRequestDetails toReservationDetails(String slotDetails) {
+        RestaurantReservationRequestDetails details;
         try {
-            details = jsonUtils.deserialize(slotDetails, RestaurantReservationDetails.class);
+            details = jsonUtils.deserialize(slotDetails, RestaurantReservationRequestDetails.class);
         } catch (Exception e) {
             log.error("Can not deserialize restaurant reservation details!");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Can not deserialize restaurant reservation details!");
@@ -128,21 +132,22 @@ public class RestaurantWaitingListFacade implements WaitingListFacade {
     public void updateWaitingList(Long id) {
         WaitingList waitingList = waitingListService.getByIdAndStatus(id, WaitingStatus.ACTIVE);
 
-        if (waitingList.getPreferredDate().isAfter(LocalDate.now(ZONE_ID)) ||
+        if (waitingList.getPreferredDate().isBefore(LocalDate.now(ZONE_ID)) ||
                 (waitingList.getPreferredDate().equals(LocalDate.now(ZONE_ID)) &&
-                        waitingList.getPreferredTime().isAfter(LocalTime.now(ZONE_ID)))) {
+                        waitingList.getPreferredTime().isBefore(LocalTime.now(ZONE_ID)))) {
             waitingList.setWaitingStatus(WaitingStatus.EXPIRED);
             waitingListService.save(waitingList);
             return;
         }
 
-        Set<Slot> slots = waitingList.getBranch().getSlotSet();
+        List<Slot> slots = slotService.findByBranchId(waitingList.getBranch().getId(), Pageable.unpaged()).getContent();
         for (Slot slot : slots) {
             RestaurantSlotDetails slotDetails = toSlotDetails(slot.getSlotDetails());
-            RestaurantReservationDetails requestDetails = toReservationDetails(waitingList.getWaitingListDetails());
+
+            RestaurantReservationRequestDetails requestDetails = toReservationDetails(waitingList.getWaitingListDetails());
             if (requestDetails.getNumberOfPeople() > slotDetails.getTableCapacity() ||
-                    (waitingList.getPreferredTime().isBefore(slotDetails.getReservationStartTime()) ||
-                            waitingList.getPreferredTime().isAfter(slotDetails.getReservationEndTime()))) continue;
+                    (requestDetails.getPreferredTime().isBefore(slotDetails.getReservationStartTime()) ||
+                            requestDetails.getPreferredTime().isAfter(slotDetails.getReservationEndTime()))) continue;
 
 
             List<Reservation> reservations = reservationService.getByStatusAndReservationDay(List.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED, ReservationStatus.CHECKED_IN), waitingList.getPreferredDate());

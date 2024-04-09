@@ -7,7 +7,6 @@ import com.makingscience.levelupproject.repository.AcquiringTransactionRepositor
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -35,7 +34,9 @@ public class AcquiringTransactionService {
 
     public void refund(Long reservationId) {
 
-        AcquiringTransaction transaction = acquiringTransactionRepository.getByReservationId(reservationId);
+        AcquiringTransaction transaction = acquiringTransactionRepository.getByReservationId(reservationId).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Acquiring transaction for reservation with id " + reservationId + " not found!"));
+
         if (!transaction.getAcquiringTransactionStatus().equals(AcquiringTransactionStatus.REFUNDED))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Transaction with id " + transaction.getId() + "is already refunded!");
 

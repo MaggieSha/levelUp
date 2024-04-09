@@ -1,33 +1,30 @@
 package com.makingscience.levelupproject.model.entities.postgre;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "user_rating")
+@Table(name = "branch_rating")
 @RequiredArgsConstructor
-public class UserRating {
-
+public class Review {
     @Column(name = "id")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id" , referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "branch_id" , referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "branch_id")
     private Branch branch;
 
     @Column(name = "rating")
@@ -39,8 +36,8 @@ public class UserRating {
     @Column(name = "comment")
     private String comment;
 
-
-
-
+    @OneToOne
+    @JoinColumn(unique = true, name = "reservation_id", referencedColumnName = "id")
+    private Reservation reservation;
 
 }

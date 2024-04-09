@@ -1,18 +1,16 @@
-package com.makingscience.levelupproject.facade;
+package com.makingscience.levelupproject.facade.restaurant;
 
 import com.makingscience.levelupproject.facade.interfaces.SlotFacade;
 import com.makingscience.levelupproject.model.SlotDTO;
 import com.makingscience.levelupproject.model.details.slot.RestaurantSlotDetails;
 import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Branch;
-import com.makingscience.levelupproject.model.entities.postgre.Reservation;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
-import com.makingscience.levelupproject.model.enums.ReservationStatus;
 import com.makingscience.levelupproject.model.enums.SlotStatus;
 import com.makingscience.levelupproject.model.enums.Type;
 import com.makingscience.levelupproject.model.params.*;
+import com.makingscience.levelupproject.repository.FilterQueryResponse;
 import com.makingscience.levelupproject.service.BranchService;
-import com.makingscience.levelupproject.service.ReservationService;
 import com.makingscience.levelupproject.service.SlotService;
 import com.makingscience.levelupproject.utils.JsonUtils;
 import jakarta.validation.ConstraintViolation;
@@ -21,15 +19,13 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -40,10 +36,9 @@ public class RestaurantSlotFacade implements SlotFacade {
     private final BranchService branchService;
     private final SlotService slotService;
     private final JsonUtils jsonUtils;
-    private final ReservationService reservationService;
 
     @Override
-    public SlotDTO add(CreateSlotParam param) {
+    public SlotDTO createSlot(CreateSlotParam param) {
         Branch branch = branchService.getById(param.getBranchId());
         RestaurantSlotDetails restaurantSlotDetails = getRestaurantSlotDetails(param.getSlotDetails(), branch);
 
@@ -59,7 +54,6 @@ public class RestaurantSlotFacade implements SlotFacade {
         slot.setExternalId(param.getExternalId());
         slot.setReserveFee(param.getReserveFee());
         slot.setName(param.getName());
-
         setDetails(restaurantSlotDetails, slot);
         slot = slotService.save(slot);
         return SlotDTO.of(slot, restaurantSlotDetails);
@@ -100,17 +94,15 @@ public class RestaurantSlotFacade implements SlotFacade {
     }
 
     @Override
-    public SlotDTO update(Slot slot, UpdateSlotParam param) {
+    public SlotDTO updateSlot(Slot slot, UpdateSlotParam param) {
         if (param.getExternalId() != null) slot.setExternalId(param.getExternalId());
         if (param.getName() != null) slot.setName(param.getName());
         if (param.getReserveFee() != null) slot.setReserveFee(param.getReserveFee());
-        RestaurantSlotDetails oldSlotDetails = toDetails(slot.getSlotDetails());
+
+        RestaurantSlotDetails oldSlotDetails = getDetails(slot.getSlotDetails());
+
         if (param.getSlotDetails() != null) {
-            RestaurantSlotDetails newSlotDetails;
-            if (param.getSlotDetails() instanceof RestaurantSlotDetails) {
-                newSlotDetails = (RestaurantSlotDetails) param.getSlotDetails();
-            } else
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Slot type should be " + slot.getBranch().getMerchant().getCategory().getName());
+            RestaurantSlotDetails newSlotDetails = getRestaurantSlotDetails(slot, param);
 
             if (newSlotDetails.getTableCapacity() != null)
                 oldSlotDetails.setTableCapacity(newSlotDetails.getTableCapacity());
@@ -124,12 +116,21 @@ public class RestaurantSlotFacade implements SlotFacade {
 
             setDetails(oldSlotDetails, slot);
 
-
         }
 
         slot = slotService.save(slot);
         return SlotDTO.of(slot, oldSlotDetails);
 
+    }
+
+    @NotNull
+    private static RestaurantSlotDetails getRestaurantSlotDetails(Slot slot, UpdateSlotParam param) {
+        RestaurantSlotDetails newSlotDetails;
+        if (param.getSlotDetails() instanceof RestaurantSlotDetails) {
+            newSlotDetails = (RestaurantSlotDetails) param.getSlotDetails();
+        } else
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Slot type should be " + slot.getBranch().getMerchant().getCategory().getName());
+        return newSlotDetails;
     }
 
 
@@ -138,21 +139,9 @@ public class RestaurantSlotFacade implements SlotFacade {
         return Type.RESTAURANT;
     }
 
-    @Override
-    public SlotDTO getById(Slot slot) {
-        RestaurantSlotDetails slotDetails = null;
-        try {
-            slotDetails = jsonUtils.deserialize(slot.getSlotDetails(), RestaurantSlotDetails.class);
-        } catch (Exception e) {
-            log.error("Can not deserialize restaurant slot details!");
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Can not deserialize restaurant slot details!");
-        }
-        return SlotDTO.of(slot, slotDetails);
-    }
-
 
     @Override
-    public RestaurantSlotDetails toDetails(String slotDetails) {
+    public RestaurantSlotDetails getDetails(String slotDetails) {
         RestaurantSlotDetails details;
         try {
             details = jsonUtils.deserialize(slotDetails, RestaurantSlotDetails.class);
@@ -164,36 +153,15 @@ public class RestaurantSlotFacade implements SlotFacade {
     }
 
     @Override
-    public Page<Slot> filter(SlotFilterParam param, Pageable pageable) {
+    public Page<FilterQueryResponse> filter(SlotFilterParam param, Pageable pageable) {
         Branch branch = branchService.getById(param.getBranchId());
         RestaurantSlotFilterDetails filter = getRestaurantSlotFilterDetails(param.getSlotFilterDetails(), branch);
         validateParam(filter);
 
-        Set<Slot> allSlots = branch.getSlotSet();
-        List<Slot> availableSlots = new ArrayList<>();
+        Page<FilterQueryResponse> slots = slotService.filterForRestaurant(filter.getNumberOfPeople(), filter.getPreferredDay(), param.getBranchId(), pageable);
 
+        return slots;
 
-        for (Slot slot : allSlots) {
-            RestaurantSlotDetails details = toDetails(slot.getSlotDetails());
-            if (details.getTableCapacity() < filter.getNumberOfPeople()) continue;
-            List<Reservation> reservations = reservationService.getByStatusAndReservationDay(List.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED, ReservationStatus.CHECKED_IN), filter.getPreferredDay());
-            if(!reservations.isEmpty()) continue;
-            availableSlots.add(slot);
-        }
-
-        int pageNumber = pageable.getPageNumber();
-        int pageSize = pageable.getPageSize();
-
-        int startIndex = pageNumber * pageSize;
-
-        if (startIndex < availableSlots.size()) {
-            int endIndex = Math.min(startIndex + pageSize, availableSlots.size());
-
-            List<Slot> pageRecords = availableSlots.subList(startIndex, endIndex);
-            return new PageImpl<>(pageRecords, pageable, availableSlots.size());
-
-
-        } else return new PageImpl<>(new ArrayList<>(), pageable, availableSlots.size());
 
     }
 

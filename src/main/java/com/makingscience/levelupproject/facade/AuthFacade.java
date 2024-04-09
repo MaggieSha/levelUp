@@ -95,8 +95,6 @@ public class AuthFacade {
     }
 
     private User registerUser(UserRegistrationParam param) {
-
-
         Optional<User> optionalUserAccount = userService.getByEmail(param.getEmail());
         if (optionalUserAccount.isPresent()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User already exists with email: " + param.getEmail());

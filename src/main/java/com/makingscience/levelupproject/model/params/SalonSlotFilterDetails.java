@@ -1,19 +1,19 @@
-package com.makingscience.levelupproject.model.details.slot;
+package com.makingscience.levelupproject.model.params;
 
 import com.makingscience.levelupproject.model.enums.SalonService;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class SalonSlotDetails extends SlotDetails {
+@Getter
+public class SalonSlotFilterDetails  extends SlotFilterDetails {
+    private LocalDate preferredDay;
+    private LocalTime preferredTime;
     private SalonService serviceName;
     private String stylistName;
-    private Integer visitHour;
 }

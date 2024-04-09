@@ -5,6 +5,7 @@ import com.makingscience.levelupproject.model.entities.postgre.Merchant;
 import com.makingscience.levelupproject.model.enums.MerchantStatus;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Setter
@@ -35,6 +36,7 @@ public class MerchantDTO {
     private String documentAddress;
 
     private MerchantStatus status;
+    private Double rating;
 
     public static MerchantDTO of(Merchant merchant) {
         MerchantDTO merchantDTO = new MerchantDTO();
@@ -46,6 +48,30 @@ public class MerchantDTO {
         merchantDTO.setIdentificationNumber(merchant.getIdentificationNumber());
         merchantDTO.setImage(merchant.getImage());
         merchantDTO.setDocumentAddress(merchant.getDocumentAddress());
+        merchantDTO.setStatus(merchant.getStatus());
+        merchantDTO.setPhone(merchant.getPhone());
+        merchantDTO.setCategoryName(merchant.getCategory().getName());
+        return merchantDTO;
+    }
+
+    public MerchantDTO(UUID id, String name, Long categoryId,String categoryName,String email,String mobileNumber,MerchantStatus status,Double rating) {
+        this.id = id;
+        this.name = name;
+        this.rating = rating;
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.email = email;
+        this.phone = mobileNumber;
+        this.status = status;
+
+    }
+
+    public static MerchantDTO toShortDTO(Merchant merchant) {
+        MerchantDTO merchantDTO = new MerchantDTO();
+        merchantDTO.setId(merchant.getId());
+        merchantDTO.setCategoryId(merchant.getCategory().getId());
+        merchantDTO.setName(merchant.getName());
+        merchantDTO.setEmail(merchant.getEmail());
         merchantDTO.setStatus(merchant.getStatus());
         merchantDTO.setPhone(merchant.getPhone());
         merchantDTO.setCategoryName(merchant.getCategory().getName());

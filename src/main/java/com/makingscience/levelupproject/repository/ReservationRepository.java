@@ -1,7 +1,10 @@
 package com.makingscience.levelupproject.repository;
 
 import com.makingscience.levelupproject.model.entities.postgre.Reservation;
+import com.makingscience.levelupproject.model.entities.postgre.User;
 import com.makingscience.levelupproject.model.enums.ReservationStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -18,4 +21,11 @@ public interface ReservationRepository  extends JpaRepository<Reservation,Long> 
 
     @Query("select r from Reservation  r where r.id = :reservationId and r.user.id = :id")
     Optional<Reservation> findByIdAndUser(Long reservationId, UUID id);
+    @Query("select r from Reservation  r where r.user.id = :userId")
+    Page<Reservation> findAllByUser(UUID userId, Pageable pageable);
+
+    @Query("select r from Reservation  r where r.slot.branch.id = :branchId")
+    Page<Reservation> findAllByBranch(UUID branchId, Pageable pageable);
+    @Query("select r from Reservation  r where r.slot.branch.merchant.id = :merchantId")
+    Page<Reservation> findAllByMerchant(UUID merchantId, Pageable pageable);
 }

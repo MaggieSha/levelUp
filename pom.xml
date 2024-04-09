@@ -42,7 +42,16 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>io.hypersistence</groupId>
+			<artifactId>hypersistence-utils-hibernate-63</artifactId>
+			<version>3.7.3</version>
+		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>io.hypersistence</groupId>-->
+<!--			<artifactId>hypersistence-utils-hibernate-55</artifactId>-->
+<!--			<version>3.7.0</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>

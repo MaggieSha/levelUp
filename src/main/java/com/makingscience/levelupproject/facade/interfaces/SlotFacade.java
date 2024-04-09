@@ -7,21 +7,22 @@ import com.makingscience.levelupproject.model.enums.Type;
 import com.makingscience.levelupproject.model.params.CreateSlotParam;
 import com.makingscience.levelupproject.model.params.SlotFilterParam;
 import com.makingscience.levelupproject.model.params.UpdateSlotParam;
+import com.makingscience.levelupproject.repository.FilterQueryResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface SlotFacade {
 
-    SlotDTO add(CreateSlotParam param);
-    SlotDTO update(Slot slot, UpdateSlotParam param);
+    SlotDTO createSlot(CreateSlotParam param);
 
+    SlotDTO updateSlot(Slot slot, UpdateSlotParam param);
 
 
     Type getType();
 
-    SlotDTO getById(Slot slot);
+    SlotDetails getDetails(String slotDetails);
 
-    SlotDetails toDetails(String slotDetails);
 
-    Page<Slot> filter(SlotFilterParam slotFilterParam, Pageable pageable);
+
+    Page<FilterQueryResponse> filter(SlotFilterParam slotFilterParam, Pageable pageable);
 }

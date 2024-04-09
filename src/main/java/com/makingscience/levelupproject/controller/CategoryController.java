@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,24 +25,28 @@ public class CategoryController {
     private final CategoryFacade categoryFacade;
 
     @PostMapping
+//    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<CategoryDTO> add(@Valid @RequestBody CreateCategoryParam param) {
         CategoryDTO categoryDTO = categoryFacade.add(param);
         return ResponseEntity.ok(categoryDTO);
     }
 
     @PutMapping
+//    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<CategoryDTO> update(@Valid @RequestBody UpdateCategoryParam param) {
         CategoryDTO categoryDTO = categoryFacade.update(param);
         return ResponseEntity.ok(categoryDTO);
     }
 
     @DeleteMapping("/{id}")
+//    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<Void> delete(@Valid @PathVariable Long id) {
         categoryFacade.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
+//    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<CategoryDTO> getById(@Valid @PathVariable Long id) {
         CategoryDTO categoryDTO = categoryFacade.getById(id);
         return ResponseEntity.ok(categoryDTO);

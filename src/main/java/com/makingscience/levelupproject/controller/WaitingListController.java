@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @Slf4j
 public class WaitingListController {
-        private final WaitingListFacadeRouter waitingListFacadeRouter;
+
+    private final WaitingListFacadeRouter waitingListFacadeRouter;
+
     @PostMapping
     public ResponseEntity<WaitingListDTO> add(@Valid @RequestBody WaitingListRequest param) {
         WaitingListDTO waitingListDTO = waitingListFacadeRouter.add(param);

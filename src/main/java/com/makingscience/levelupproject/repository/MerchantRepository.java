@@ -1,5 +1,6 @@
 package com.makingscience.levelupproject.repository;
 
+import com.makingscience.levelupproject.model.MerchantDTO;
 import com.makingscience.levelupproject.model.entities.postgre.Merchant;
 import com.makingscience.levelupproject.model.entities.postgre.User;
 import com.makingscience.levelupproject.model.enums.MerchantStatus;
@@ -27,4 +28,8 @@ public interface MerchantRepository extends JpaRepository<Merchant, UUID> {
     Page<Merchant> getAllMerchantsByCategory(Pageable pageable, Long categoryId, MerchantStatus status);
 
     Page<Merchant> findAllByStatus(Pageable pageable,MerchantStatus status);
+
+    @Query("select new com.makingscience.levelupproject.model.MerchantDTO(m.id,m.name,m.category.id,m.category.name,m.email,m.phone,m.status,avg(r.rating) as rating) " +
+            "from Merchant m left join Review r on m.id = r.branch.merchant.id group by m.id,m.name,m.category,m.email,m.phone,m.status order by rating ")
+    Page<MerchantDTO> getAllMerchantByRating(Pageable pageable);
 }

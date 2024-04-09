@@ -126,7 +126,7 @@ public class MerchantFacade {
 
     public Page<MerchantDTO> getAllMerchants(Pageable pageable) {
         Page<Merchant> merchants = merchantService.getAllMerchants(pageable);
-        List<MerchantDTO> dtos  = merchants.stream().map(MerchantDTO::of).toList();
+        List<MerchantDTO> dtos  = merchants.stream().map(MerchantDTO::toShortDTO).toList();
         return new PageImpl<>(dtos,pageable,merchants.getTotalElements());
     }
 
@@ -136,7 +136,11 @@ public class MerchantFacade {
 
     public Page<MerchantDTO> getAllMerchantsByCategory(Pageable pageable, Long categoryId) {
         Page<Merchant> merchants = merchantService.getAllMerchantsByCategory(pageable,categoryId);
-        List<MerchantDTO> dtos  = merchants.stream().map(MerchantDTO::of).toList();
+        List<MerchantDTO> dtos  = merchants.stream().map(MerchantDTO::toShortDTO).toList();
         return new PageImpl<>(dtos,pageable,merchants.getTotalElements());
+    }
+
+    public Page<MerchantDTO> getAllMerchantsByRating(Pageable pageable) {
+        return  merchantService.getAllMerchantByRating(pageable);
     }
 }
