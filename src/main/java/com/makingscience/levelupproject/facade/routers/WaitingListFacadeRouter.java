@@ -1,7 +1,7 @@
 package com.makingscience.levelupproject.facade.routers;
 
 import com.makingscience.levelupproject.facade.interfaces.WaitingListFacade;
-import com.makingscience.levelupproject.model.WaitingListDTO;
+import com.makingscience.levelupproject.model.dto.WaitingListDTO;
 import com.makingscience.levelupproject.model.entities.postgre.Branch;
 import com.makingscience.levelupproject.model.params.WaitingListRequest;
 import com.makingscience.levelupproject.service.BranchService;

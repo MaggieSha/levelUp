@@ -1,11 +1,7 @@
 package com.makingscience.levelupproject.service;
 
-import com.makingscience.levelupproject.model.CategoryDTO;
 import com.makingscience.levelupproject.model.entities.postgre.Category;
 import com.makingscience.levelupproject.model.enums.CategoryStatus;
-import com.makingscience.levelupproject.model.enums.Type;
-import com.makingscience.levelupproject.model.params.CreateCategoryParam;
-import com.makingscience.levelupproject.model.params.UpdateCategoryParam;
 import com.makingscience.levelupproject.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

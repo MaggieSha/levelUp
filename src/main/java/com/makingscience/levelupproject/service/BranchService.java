@@ -1,6 +1,5 @@
 package com.makingscience.levelupproject.service;
 
-import com.makingscience.levelupproject.model.BranchDTO;
 import com.makingscience.levelupproject.model.entities.postgre.Branch;
 import com.makingscience.levelupproject.model.enums.BranchStatus;
 import com.makingscience.levelupproject.repository.BranchRepository;
@@ -8,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 

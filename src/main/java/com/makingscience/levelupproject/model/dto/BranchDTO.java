@@ -1,19 +1,10 @@
-package com.makingscience.levelupproject.model;
+package com.makingscience.levelupproject.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.makingscience.levelupproject.model.entities.postgre.Branch;
-import com.makingscience.levelupproject.model.entities.postgre.Merchant;
-import com.makingscience.levelupproject.model.entities.postgre.Slot;
-import com.makingscience.levelupproject.model.entities.postgre.WaitingList;
 import com.makingscience.levelupproject.model.enums.BranchStatus;
-import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.util.Set;
 import java.util.UUID;
 
 @Setter

@@ -1,12 +1,9 @@
 package com.makingscience.levelupproject.controller;
 
 import com.makingscience.levelupproject.facade.BranchFacade;
-import com.makingscience.levelupproject.model.BranchDTO;
-import com.makingscience.levelupproject.model.MerchantDTO;
+import com.makingscience.levelupproject.model.dto.BranchDTO;
 import com.makingscience.levelupproject.model.params.CreateBranchParam;
-import com.makingscience.levelupproject.model.params.CreateMerchantParam;
 import com.makingscience.levelupproject.model.params.UpdateBranchParam;
-import com.makingscience.levelupproject.model.params.UpdateMerchantParam;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

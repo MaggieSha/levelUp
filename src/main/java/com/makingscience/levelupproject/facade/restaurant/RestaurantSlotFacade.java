@@ -1,9 +1,8 @@
 package com.makingscience.levelupproject.facade.restaurant;
 
 import com.makingscience.levelupproject.facade.interfaces.SlotFacade;
-import com.makingscience.levelupproject.model.SlotDTO;
+import com.makingscience.levelupproject.model.dto.SlotDTO;
 import com.makingscience.levelupproject.model.details.slot.RestaurantSlotDetails;
-import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Branch;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
 import com.makingscience.levelupproject.model.enums.SlotStatus;
@@ -19,7 +18,6 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -40,7 +38,8 @@ public class RestaurantSlotFacade implements SlotFacade {
     @Override
     public SlotDTO createSlot(CreateSlotParam param) {
         Branch branch = branchService.getById(param.getBranchId());
-        RestaurantSlotDetails restaurantSlotDetails = getRestaurantSlotDetails(param.getSlotDetails(), branch);
+
+        RestaurantSlotDetails restaurantSlotDetails = (RestaurantSlotDetails) param.getSlotDetails();
 
         validateParam(restaurantSlotDetails);
 
@@ -54,55 +53,29 @@ public class RestaurantSlotFacade implements SlotFacade {
         slot.setExternalId(param.getExternalId());
         slot.setReserveFee(param.getReserveFee());
         slot.setName(param.getName());
-        setDetails(restaurantSlotDetails, slot);
+        slot.setSlotDetails(restaurantSlotDetails);
         slot = slotService.save(slot);
         return SlotDTO.of(slot, restaurantSlotDetails);
     }
 
-    private void setDetails(RestaurantSlotDetails restaurantSlotDetails, Slot slot) {
-        try {
-            String details = jsonUtils.serialize(restaurantSlotDetails);
-            slot.setSlotDetails(details);
-        } catch (Exception e) {
-            log.error("Error during slot details serialization - {}!", e);
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Error during slot details serialization - " + e + "!");
-        }
-    }
-
-    private static void validateParam(RestaurantSlotDetails restaurantSlotDetails) {
-        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-        Validator validator = validatorFactory.getValidator();
-        Set<ConstraintViolation<RestaurantSlotDetails>> violations = validator.validate(restaurantSlotDetails);
-        if (!violations.isEmpty()) {
-            StringBuilder errorMessage = new StringBuilder();
-            for (ConstraintViolation<RestaurantSlotDetails> v : violations) {
-                errorMessage.append(v.getMessage()).append("; ");
-            }
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage.toString());
-
-        }
-    }
 
 
-    private static RestaurantSlotDetails getRestaurantSlotDetails(SlotDetails param, Branch branch) {
-        RestaurantSlotDetails restaurantSlotDetails;
-        if (param instanceof RestaurantSlotDetails) {
-            restaurantSlotDetails = (RestaurantSlotDetails) param;
-        } else
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Slot type should be " + branch.getMerchant().getCategory().getName());
-        return restaurantSlotDetails;
-    }
+
+
+
 
     @Override
     public SlotDTO updateSlot(Slot slot, UpdateSlotParam param) {
+
         if (param.getExternalId() != null) slot.setExternalId(param.getExternalId());
         if (param.getName() != null) slot.setName(param.getName());
         if (param.getReserveFee() != null) slot.setReserveFee(param.getReserveFee());
 
-        RestaurantSlotDetails oldSlotDetails = getDetails(slot.getSlotDetails());
+
+        RestaurantSlotDetails oldSlotDetails = (RestaurantSlotDetails) slot.getSlotDetails();
 
         if (param.getSlotDetails() != null) {
-            RestaurantSlotDetails newSlotDetails = getRestaurantSlotDetails(slot, param);
+            RestaurantSlotDetails newSlotDetails = (RestaurantSlotDetails) param.getSlotDetails();
 
             if (newSlotDetails.getTableCapacity() != null)
                 oldSlotDetails.setTableCapacity(newSlotDetails.getTableCapacity());
@@ -114,7 +87,7 @@ public class RestaurantSlotFacade implements SlotFacade {
                 oldSlotDetails.setPaidCancelledHours(newSlotDetails.getPaidCancelledHours());
 
 
-            setDetails(oldSlotDetails, slot);
+            slot.setSlotDetails(oldSlotDetails);
 
         }
 
@@ -123,15 +96,6 @@ public class RestaurantSlotFacade implements SlotFacade {
 
     }
 
-    @NotNull
-    private static RestaurantSlotDetails getRestaurantSlotDetails(Slot slot, UpdateSlotParam param) {
-        RestaurantSlotDetails newSlotDetails;
-        if (param.getSlotDetails() instanceof RestaurantSlotDetails) {
-            newSlotDetails = (RestaurantSlotDetails) param.getSlotDetails();
-        } else
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Slot type should be " + slot.getBranch().getMerchant().getCategory().getName());
-        return newSlotDetails;
-    }
 
 
     @Override
@@ -154,8 +118,7 @@ public class RestaurantSlotFacade implements SlotFacade {
 
     @Override
     public Page<FilterQueryResponse> filter(SlotFilterParam param, Pageable pageable) {
-        Branch branch = branchService.getById(param.getBranchId());
-        RestaurantSlotFilterDetails filter = getRestaurantSlotFilterDetails(param.getSlotFilterDetails(), branch);
+        RestaurantSlotFilterDetails filter = (RestaurantSlotFilterDetails) param.getSlotFilterDetails();
         validateParam(filter);
 
         Page<FilterQueryResponse> slots = slotService.filterForRestaurant(filter.getNumberOfPeople(), filter.getPreferredDay(), param.getBranchId(), pageable);
@@ -165,14 +128,6 @@ public class RestaurantSlotFacade implements SlotFacade {
 
     }
 
-    private static RestaurantSlotFilterDetails getRestaurantSlotFilterDetails(SlotFilterDetails param, Branch branch) {
-        RestaurantSlotFilterDetails restaurantSlotFilterDetails;
-        if (param instanceof RestaurantSlotFilterDetails) {
-            restaurantSlotFilterDetails = (RestaurantSlotFilterDetails) param;
-        } else
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Slot type should be " + branch.getMerchant().getCategory().getName());
-        return restaurantSlotFilterDetails;
-    }
 
     private static void validateParam(RestaurantSlotFilterDetails restaurantSlotDetails) {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
@@ -181,6 +136,20 @@ public class RestaurantSlotFacade implements SlotFacade {
         if (!violations.isEmpty()) {
             StringBuilder errorMessage = new StringBuilder();
             for (ConstraintViolation<RestaurantSlotFilterDetails> v : violations) {
+                errorMessage.append(v.getMessage()).append("; ");
+            }
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage.toString());
+
+        }
+    }
+
+    private static void validateParam(RestaurantSlotDetails restaurantSlotDetails) {
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        Validator validator = validatorFactory.getValidator();
+        Set<ConstraintViolation<RestaurantSlotDetails>> violations = validator.validate(restaurantSlotDetails);
+        if (!violations.isEmpty()) {
+            StringBuilder errorMessage = new StringBuilder();
+            for (ConstraintViolation<RestaurantSlotDetails> v : violations) {
                 errorMessage.append(v.getMessage()).append("; ");
             }
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage.toString());

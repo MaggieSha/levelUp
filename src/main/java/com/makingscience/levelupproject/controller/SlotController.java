@@ -1,8 +1,8 @@
 package com.makingscience.levelupproject.controller;
 
 import com.makingscience.levelupproject.facade.routers.SlotFacadeRouter;
-import com.makingscience.levelupproject.model.SlotDTO;
-import com.makingscience.levelupproject.model.SlotFilterDTO;
+import com.makingscience.levelupproject.model.dto.SlotDTO;
+import com.makingscience.levelupproject.model.dto.SlotFilterDTO;
 import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.params.CreateSlotParam;
 import com.makingscience.levelupproject.model.params.SlotFilterParam;
@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

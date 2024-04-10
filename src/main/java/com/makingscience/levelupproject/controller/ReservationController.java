@@ -1,7 +1,7 @@
 package com.makingscience.levelupproject.controller;
 
 import com.makingscience.levelupproject.facade.routers.ReservationFacadeRouter;
-import com.makingscience.levelupproject.model.ReservationDTO;
+import com.makingscience.levelupproject.model.dto.ReservationDTO;
 import com.makingscience.levelupproject.model.details.reservation.ReservationDetails;
 import com.makingscience.levelupproject.model.enums.ReservationStatus;
 import com.makingscience.levelupproject.model.params.ReservationRequest;

@@ -26,7 +26,7 @@ public class Scheduler {
     private final BranchService branchService;
     private final WaitingListService waitingListService;
 
-    @Scheduled(fixedDelay = 60 * 60 * 1000, initialDelay = 1000)
+    @Scheduled(fixedDelay = 60 * 60 * 1000)
     public void updateWaitingList() {
         log.info("The time is now {}", LocalDateTime.now(ZoneId.of("Asia/Tbilisi")));
         List<WaitingList> waitingLists = waitingListService.getByStatus(WaitingStatus.ACTIVE);

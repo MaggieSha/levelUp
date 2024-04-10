@@ -1,7 +1,7 @@
 package com.makingscience.levelupproject.controller;
 
 import com.makingscience.levelupproject.facade.routers.WaitingListFacadeRouter;
-import com.makingscience.levelupproject.model.WaitingListDTO;
+import com.makingscience.levelupproject.model.dto.WaitingListDTO;
 import com.makingscience.levelupproject.model.params.WaitingListRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

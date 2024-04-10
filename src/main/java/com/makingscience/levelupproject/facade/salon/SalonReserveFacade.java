@@ -1,12 +1,11 @@
-package com.makingscience.levelupproject.facade.restaurant;
-
+package com.makingscience.levelupproject.facade.salon;
 
 import com.makingscience.levelupproject.facade.interfaces.ReservationFacade;
 import com.makingscience.levelupproject.model.dto.ReservationDTO;
-import com.makingscience.levelupproject.model.details.request.RestaurantReservationRequestDetails;
+import com.makingscience.levelupproject.model.details.request.SalonReservationRequestDetails;
 import com.makingscience.levelupproject.model.details.reservation.ReservationDetails;
-import com.makingscience.levelupproject.model.details.reservation.RestaurantReservationDetails;
-import com.makingscience.levelupproject.model.details.slot.RestaurantSlotDetails;
+import com.makingscience.levelupproject.model.details.reservation.SalonReservationDetails;
+import com.makingscience.levelupproject.model.details.slot.SalonSlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Reservation;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
 import com.makingscience.levelupproject.model.entities.postgre.User;
@@ -36,8 +35,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RestaurantReserveFacade implements ReservationFacade {
-
+public class SalonReserveFacade implements ReservationFacade {
     private final SlotService slotService;
     private final JwtUtils jwtUtils;
     private final ReservationService reservationService;
@@ -46,15 +44,17 @@ public class RestaurantReserveFacade implements ReservationFacade {
     public static final ZoneId ZONE_ID = ZoneId.of("Asia/Tbilisi");
 
 
+
     @Override
     public ReservationDTO add(ReservationRequest param) {
         User authenticatedUser = jwtUtils.getAuthenticatedUser();
 
-        RestaurantReservationRequestDetails requestDetails = (RestaurantReservationRequestDetails) param.getReservationRequestDetails();
+        SalonReservationRequestDetails requestDetails = (SalonReservationRequestDetails) param.getReservationRequestDetails();
 
         validateParam(requestDetails);
 
-        List<Slot> slots = slotService.getAvailableSlotsForRestaurant(requestDetails.getNumberOfPeople(), param.getReservationDay(), param.getBranchId());
+        List<Slot> slots = slotService.getAvailableSlotsForSalon(requestDetails.getServiceName(),requestDetails.getStylistName(),requestDetails.getPreferredTime(), param.getReservationDay(), param.getBranchId());
+
 
         if (slots.isEmpty())
             throw new ResponseStatusException(HttpStatus.CONFLICT, "All slots with requested properties are already reserved!");
@@ -66,8 +66,9 @@ public class RestaurantReserveFacade implements ReservationFacade {
         reservation.setSlot(slots.get(0));
         reservation.setUser(authenticatedUser);
 
-        RestaurantReservationDetails reservationDetails = new RestaurantReservationDetails();
-        reservationDetails.setNumberOfPeople(requestDetails.getNumberOfPeople());
+        SalonReservationDetails reservationDetails = new SalonReservationDetails();
+        reservationDetails.setServiceName(requestDetails.getServiceName());
+        reservationDetails.setStylistName(requestDetails.getStylistName());
 
         reservation.setReservationDetails(reservationDetails);
         reservationService.save(reservation);
@@ -85,7 +86,7 @@ public class RestaurantReserveFacade implements ReservationFacade {
         User authenticatedUser = jwtUtils.getAuthenticatedUser();
         Reservation reservation = reservationService.getByIdAndUser(reservationId, authenticatedUser.getId());
 
-        RestaurantSlotDetails slotDetails = (RestaurantSlotDetails) reservation.getSlot().getSlotDetails();
+        SalonSlotDetails slotDetails = (SalonSlotDetails) reservation.getSlot().getSlotDetails();
 
 
         LocalDateTime reservationTime = LocalDateTime.of(reservation.getReservationDay(), reservation.getReservationTime());
@@ -107,19 +108,21 @@ public class RestaurantReserveFacade implements ReservationFacade {
     }
     @Override
     public Type getType() {
-        return Type.RESTAURANT;
+        return Type.SALON;
     }
-    private static void validateParam(RestaurantReservationRequestDetails requestDetails) {
+
+    private static void validateParam(SalonReservationRequestDetails requestDetails) {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         Validator validator = validatorFactory.getValidator();
-        Set<ConstraintViolation<RestaurantReservationRequestDetails>> violations = validator.validate(requestDetails);
+        Set<ConstraintViolation<SalonReservationRequestDetails>> violations = validator.validate(requestDetails);
         if (!violations.isEmpty()) {
             StringBuilder errorMessage = new StringBuilder();
-            for (ConstraintViolation<RestaurantReservationRequestDetails> v : violations) {
+            for (ConstraintViolation<SalonReservationRequestDetails> v : violations) {
                 errorMessage.append(v.getMessage()).append("; ");
             }
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage.toString());
 
         }
     }
+
 }

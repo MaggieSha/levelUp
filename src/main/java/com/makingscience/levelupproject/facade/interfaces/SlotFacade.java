@@ -1,6 +1,6 @@
 package com.makingscience.levelupproject.facade.interfaces;
 
-import com.makingscience.levelupproject.model.SlotDTO;
+import com.makingscience.levelupproject.model.dto.SlotDTO;
 import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
 import com.makingscience.levelupproject.model.enums.Type;

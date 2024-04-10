@@ -1,4 +1,4 @@
-package com.makingscience.levelupproject.model;
+package com.makingscience.levelupproject.model.dto;
 
 import com.makingscience.levelupproject.model.entities.postgre.AcquiringTransaction;
 import com.makingscience.levelupproject.model.enums.AcquiringTransactionStatus;

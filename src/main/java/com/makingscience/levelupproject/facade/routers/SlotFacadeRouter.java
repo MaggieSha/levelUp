@@ -2,8 +2,8 @@ package com.makingscience.levelupproject.facade.routers;
 
 
 import com.makingscience.levelupproject.facade.interfaces.SlotFacade;
-import com.makingscience.levelupproject.model.SlotDTO;
-import com.makingscience.levelupproject.model.SlotFilterDTO;
+import com.makingscience.levelupproject.model.dto.SlotDTO;
+import com.makingscience.levelupproject.model.dto.SlotFilterDTO;
 import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Branch;
 import com.makingscience.levelupproject.model.entities.postgre.Reservation;
@@ -43,16 +43,10 @@ public class SlotFacadeRouter {
         return chooseFacade(param.getBranchId()).createSlot(param);
     }
 
-    private SlotFacade chooseFacade(UUID branchId) {
-        Branch branch = branchService.getById(branchId);
-        return slotFacades.stream().filter(slotFacade -> slotFacade.getType().name().equals(branch.getMerchant().getCategory().getName()))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not supported category type: " + branch.getMerchant().getCategory().getName()));
-    }
 
     public SlotDTO update(UpdateSlotParam param) {
         Slot slot = slotService.findById(param.getId());
-        return chooseFacade(slot.getBranch().getId()).updateSlot(slot,param);
+        return chooseFacade(slot.getBranch().getId()).updateSlot(slot, param);
     }
 
     public void delete(Long id) {
@@ -71,37 +65,42 @@ public class SlotFacadeRouter {
 
 
     public Page<SlotFilterDTO> filter(SlotFilterParam slotFilterParam, Pageable pageable) {
-       if(slotFilterParam.getSlotFilterDetails()== null){
-           Page<FilterQueryResponse> slots = slotService.filterByBranchId(slotFilterParam.getBranchId(),pageable);
-           List<SlotFilterDTO> dtos = slots.stream().map(slot -> SlotFilterDTO.of(slot,getDetails(slot))).collect(Collectors.toList());
-           return new PageImpl<>(dtos,pageable,slots.getTotalElements());
-       }
-        Page<FilterQueryResponse> slots = chooseFacade(slotFilterParam.getBranchId()).filter(slotFilterParam,pageable);
-        List<SlotFilterDTO> dtos = slots.stream().map(slot -> SlotFilterDTO.of(slot,getDetails(slot))).collect(Collectors.toList());
-           return new PageImpl<>(dtos,pageable,slots.getTotalElements());
+        if (slotFilterParam.getSlotFilterDetails() == null) {
+            Page<FilterQueryResponse> slots = slotService.filterByBranchId(slotFilterParam.getBranchId(), pageable);
+            List<SlotFilterDTO> dtos = slots.stream().map(slot -> SlotFilterDTO.of(slot, getDetails(slot))).collect(Collectors.toList());
+            return new PageImpl<>(dtos, pageable, slots.getTotalElements());
+        }
+        Page<FilterQueryResponse> slots = chooseFacade(slotFilterParam.getBranchId()).filter(slotFilterParam, pageable);
+        List<SlotFilterDTO> dtos = slots.stream().map(slot -> SlotFilterDTO.of(slot, getDetails(slot))).collect(Collectors.toList());
+        return new PageImpl<>(dtos, pageable, slots.getTotalElements());
     }
-
 
     private SlotDetails getDetails(FilterQueryResponse slot) {
-        return chooseFacade(slot.getBranchId()).getDetails(slot.getDetailsJson());
-
-
-    }
-
-    public SlotDetails getSlotDetails(Long slotId) {
-        Slot slot = slotService.findById(slotId);
-        return chooseFacade(slot.getBranch().getId()).getDetails(slot.getSlotDetails());
+        return chooseFacade(slot.getBranchId()).getDetails(slot.getDetails());
     }
 
     public Page<SlotDTO> getSlotsByMerchant(UUID merchantId, Pageable pageable) {
         Page<Slot> slots = slotService.findByMerchantId(merchantId, pageable);
         List<SlotDTO> dtos = slots.getContent().stream().map(slot -> SlotDTO.of(slot, null)).collect(Collectors.toList());
-        return new PageImpl<>(dtos,pageable,slots.getTotalElements());
+        return new PageImpl<>(dtos, pageable, slots.getTotalElements());
     }
 
     public Page<SlotDTO> getSlotsByBranch(UUID branchId, Pageable pageable) {
         Page<Slot> slots = slotService.findByBranchId(branchId, pageable);
         List<SlotDTO> dtos = slots.getContent().stream().map(slot -> SlotDTO.of(slot, null)).collect(Collectors.toList());
-        return new PageImpl<>(dtos,pageable,slots.getTotalElements());
+        return new PageImpl<>(dtos, pageable, slots.getTotalElements());
+    }
+
+    public SlotDetails getSlotDetails(Long slotId) {
+        Slot slot = slotService.findById(slotId);
+        return slot.getSlotDetails();
+    }
+
+    private SlotFacade chooseFacade(UUID branchId) {
+        Branch branch = branchService.getById(branchId);
+        return slotFacades.stream().filter(slotFacade -> slotFacade.getType().name().equals(branch.getMerchant().getCategory().getName()))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not supported category type: " + branch.getMerchant().getCategory().getName()));
     }
 }
+

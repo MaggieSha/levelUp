@@ -1,8 +1,8 @@
-package com.makingscience.levelupproject.model;
+package com.makingscience.levelupproject.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.makingscience.levelupproject.model.details.reservation.ReservationDetails;
-import com.makingscience.levelupproject.model.details.reservation.RestaurantReservationDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Reservation;
 import com.makingscience.levelupproject.model.enums.ReservationStatus;
 import lombok.Getter;
@@ -25,8 +25,9 @@ public class ReservationDTO {
 
     private UUID userId;
 
-
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate reservationDay;
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime reservationTime;
 
     private Integer duration;

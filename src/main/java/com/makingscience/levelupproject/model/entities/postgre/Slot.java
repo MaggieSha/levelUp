@@ -49,7 +49,7 @@ public class Slot {
 
     @Type(JsonType.class)
     @Column(name = "details",columnDefinition = "jsonb")
-    private String slotDetails;
+    private SlotDetails slotDetails;
 
 
 

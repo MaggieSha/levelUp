@@ -1,7 +1,6 @@
 package com.makingscience.levelupproject.facade;
 
-import com.makingscience.levelupproject.model.BranchDTO;
-import com.makingscience.levelupproject.model.MerchantDTO;
+import com.makingscience.levelupproject.model.dto.BranchDTO;
 import com.makingscience.levelupproject.model.entities.postgre.*;
 import com.makingscience.levelupproject.model.enums.*;
 import com.makingscience.levelupproject.model.params.CreateBranchParam;

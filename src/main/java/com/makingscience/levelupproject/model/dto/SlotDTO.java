@@ -1,12 +1,8 @@
-package com.makingscience.levelupproject.model;
+package com.makingscience.levelupproject.model.dto;
 
 import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
 import lombok.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.UUID;
 
 @Setter
 @NoArgsConstructor

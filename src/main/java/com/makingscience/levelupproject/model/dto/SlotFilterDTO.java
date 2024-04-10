@@ -1,4 +1,4 @@
-package com.makingscience.levelupproject.model;
+package com.makingscience.levelupproject.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.makingscience.levelupproject.model.details.slot.SlotDetails;
@@ -16,21 +16,15 @@ import java.util.UUID;
 public class SlotFilterDTO {
     private Long numberOfSlots;
     private SlotDetails slotDetails;
-    private String detailsJson;
     private UUID branchId;
 
-    public static SlotFilterDTO of(FilterQueryResponse slot, SlotDetails details) {
+    public static SlotFilterDTO of(FilterQueryResponse slot,SlotDetails slotDetails) {
         SlotFilterDTO slotFilterDTO = new SlotFilterDTO();
-        slotFilterDTO.setSlotDetails(details);
-        slotFilterDTO.setDetailsJson(null);
+        slotFilterDTO.setSlotDetails(slotDetails);
         slotFilterDTO.setNumberOfSlots(slot.getNumberOfSlots());
         slotFilterDTO.setBranchId(slot.getBranchId());
         return slotFilterDTO;
     }
 
-    public SlotFilterDTO(Long numberOfSlots, String detailsJson, UUID branchId) {
-        this.numberOfSlots = numberOfSlots;
-        this.detailsJson = detailsJson;
-        this.branchId = branchId;
-    }
+
 }

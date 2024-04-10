@@ -1,6 +1,6 @@
 package com.makingscience.levelupproject.facade;
 
-import com.makingscience.levelupproject.model.CategoryDTO;
+import com.makingscience.levelupproject.model.dto.CategoryDTO;
 import com.makingscience.levelupproject.model.entities.postgre.Category;
 import com.makingscience.levelupproject.model.enums.CategoryStatus;
 import com.makingscience.levelupproject.model.params.CreateCategoryParam;
@@ -11,13 +11,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component

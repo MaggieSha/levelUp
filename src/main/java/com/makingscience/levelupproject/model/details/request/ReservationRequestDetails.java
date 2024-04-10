@@ -8,7 +8,8 @@ import lombok.Setter;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type",visible = true,include = JsonTypeInfo.As.EXISTING_PROPERTY)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = RestaurantReservationRequestDetails.class, name = "RESTAURANT")
+        @JsonSubTypes.Type(value = RestaurantReservationRequestDetails.class, name = "RESTAURANT"),
+        @JsonSubTypes.Type(value = SalonReservationRequestDetails.class, name = "SALON")
 })
 @Getter
 @Setter

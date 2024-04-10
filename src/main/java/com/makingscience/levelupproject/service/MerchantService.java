@@ -1,7 +1,7 @@
 package com.makingscience.levelupproject.service;
 
 
-import com.makingscience.levelupproject.model.MerchantDTO;
+import com.makingscience.levelupproject.model.dto.MerchantDTO;
 import com.makingscience.levelupproject.model.entities.postgre.Merchant;
 import com.makingscience.levelupproject.model.enums.MerchantStatus;
 import com.makingscience.levelupproject.repository.MerchantRepository;

@@ -1,7 +1,7 @@
 package com.makingscience.levelupproject.controller;
 
 import com.makingscience.levelupproject.facade.CategoryFacade;
-import com.makingscience.levelupproject.model.CategoryDTO;
+import com.makingscience.levelupproject.model.dto.CategoryDTO;
 import com.makingscience.levelupproject.model.params.CreateCategoryParam;
 import com.makingscience.levelupproject.model.params.UpdateCategoryParam;
 import jakarta.validation.Valid;
@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

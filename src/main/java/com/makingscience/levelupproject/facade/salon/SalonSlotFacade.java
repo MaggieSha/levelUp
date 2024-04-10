@@ -1,9 +1,8 @@
 package com.makingscience.levelupproject.facade.salon;
 
 import com.makingscience.levelupproject.facade.interfaces.SlotFacade;
-import com.makingscience.levelupproject.model.SlotDTO;
+import com.makingscience.levelupproject.model.dto.SlotDTO;
 import com.makingscience.levelupproject.model.details.slot.SalonSlotDetails;
-import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Branch;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
 import com.makingscience.levelupproject.model.enums.SlotStatus;
@@ -19,7 +18,6 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -40,7 +38,8 @@ public class SalonSlotFacade implements SlotFacade {
     @Override
     public SlotDTO createSlot(CreateSlotParam param) {
         Branch branch = branchService.getById(param.getBranchId());
-        SalonSlotDetails slotDetails = getSlotDetails(param.getSlotDetails(), branch);
+
+        SalonSlotDetails slotDetails = (SalonSlotDetails) param.getSlotDetails();
 
         validateParam(slotDetails);
 
@@ -55,44 +54,11 @@ public class SalonSlotFacade implements SlotFacade {
         slot.setReserveFee(param.getReserveFee());
         slot.setName(param.getName());
 
-        setDetails(slotDetails, slot);
+        slot.setSlotDetails(slotDetails);
         slot = slotService.save(slot);
         return SlotDTO.of(slot, slotDetails);
     }
 
-    private void setDetails(SalonSlotDetails slotDetails, Slot slot) {
-        try {
-            String details = jsonUtils.serialize(slotDetails);
-            slot.setSlotDetails(details);
-        } catch (Exception e) {
-            log.error("Error during slot details serialization - {}!", e);
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Error during slot details serialization - " + e + "!");
-        }
-    }
-
-    private static void validateParam(SalonSlotDetails slotDetails) {
-        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-        Validator validator = validatorFactory.getValidator();
-        Set<ConstraintViolation<SalonSlotDetails>> violations = validator.validate(slotDetails);
-        if (!violations.isEmpty()) {
-            StringBuilder errorMessage = new StringBuilder();
-            for (ConstraintViolation<SalonSlotDetails> v : violations) {
-                errorMessage.append(v.getMessage()).append("; ");
-            }
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage.toString());
-
-        }
-    }
-
-
-    private static SalonSlotDetails getSlotDetails(SlotDetails param, Branch branch) {
-        SalonSlotDetails slotDetails;
-        if (param instanceof SalonSlotDetails) {
-            slotDetails = (SalonSlotDetails) param;
-        } else
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Slot type should be " + branch.getMerchant().getCategory().getName());
-        return slotDetails;
-    }
 
     @Override
     public SlotDTO updateSlot(Slot slot, UpdateSlotParam param) {
@@ -100,10 +66,11 @@ public class SalonSlotFacade implements SlotFacade {
         if (param.getName() != null) slot.setName(param.getName());
         if (param.getReserveFee() != null) slot.setReserveFee(param.getReserveFee());
 
-        SalonSlotDetails oldSlotDetails = getDetails(slot.getSlotDetails());
+        SalonSlotDetails oldSlotDetails = (SalonSlotDetails) slot.getSlotDetails();
+
 
         if (param.getSlotDetails() != null) {
-            SalonSlotDetails newSlotDetails = getSlotDetails(slot, param);
+            SalonSlotDetails newSlotDetails = (SalonSlotDetails) param.getSlotDetails();
 
             if (newSlotDetails.getStylistName() != null)
                 oldSlotDetails.setStylistName(newSlotDetails.getStylistName());
@@ -113,8 +80,7 @@ public class SalonSlotFacade implements SlotFacade {
                 oldSlotDetails.setServiceName(newSlotDetails.getServiceName());
 
 
-            setDetails(oldSlotDetails, slot);
-
+            slot.setSlotDetails(oldSlotDetails);
         }
 
         slot = slotService.save(slot);
@@ -122,15 +88,7 @@ public class SalonSlotFacade implements SlotFacade {
 
     }
 
-    @NotNull
-    private static SalonSlotDetails getSlotDetails(Slot slot, UpdateSlotParam param) {
-        SalonSlotDetails newSlotDetails;
-        if (param.getSlotDetails() instanceof SalonSlotDetails) {
-            newSlotDetails = (SalonSlotDetails) param.getSlotDetails();
-        } else
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Slot type should be " + slot.getBranch().getMerchant().getCategory().getName());
-        return newSlotDetails;
-    }
+
 
 
     @Override
@@ -157,7 +115,7 @@ public class SalonSlotFacade implements SlotFacade {
         SalonSlotFilterDetails filter = getSalonSlotFilterDetails(param.getSlotFilterDetails(), branch);
         validateParam(filter);
 
-        Page<FilterQueryResponse> slots = slotService.filterForSalon(filter.getServiceName(), filter.getStylistName(), filter.getPreferredTime().getHour(), filter.getPreferredDay(), param.getBranchId(), pageable);
+        Page<FilterQueryResponse> slots = slotService.filterForSalon(filter.getServiceName(), filter.getStylistName(), filter.getPreferredTime(), filter.getPreferredDay(), param.getBranchId(), pageable);
 
         return slots;
 
@@ -180,6 +138,22 @@ public class SalonSlotFacade implements SlotFacade {
         if (!violations.isEmpty()) {
             StringBuilder errorMessage = new StringBuilder();
             for (ConstraintViolation<SalonSlotFilterDetails> v : violations) {
+                errorMessage.append(v.getMessage()).append("; ");
+            }
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage.toString());
+
+        }
+    }
+
+
+
+    private static void validateParam(SalonSlotDetails slotDetails) {
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        Validator validator = validatorFactory.getValidator();
+        Set<ConstraintViolation<SalonSlotDetails>> violations = validator.validate(slotDetails);
+        if (!violations.isEmpty()) {
+            StringBuilder errorMessage = new StringBuilder();
+            for (ConstraintViolation<SalonSlotDetails> v : violations) {
                 errorMessage.append(v.getMessage()).append("; ");
             }
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage.toString());

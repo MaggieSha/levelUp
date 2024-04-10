@@ -1,10 +1,8 @@
 package com.makingscience.levelupproject.repository;
 
-import com.makingscience.levelupproject.model.MerchantDTO;
+import com.makingscience.levelupproject.model.dto.MerchantDTO;
 import com.makingscience.levelupproject.model.entities.postgre.Merchant;
-import com.makingscience.levelupproject.model.entities.postgre.User;
 import com.makingscience.levelupproject.model.enums.MerchantStatus;
-import com.makingscience.levelupproject.model.enums.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,9 +1,7 @@
 package com.makingscience.levelupproject.controller;
 
 import com.makingscience.levelupproject.facade.RatingFacade;
-import com.makingscience.levelupproject.model.ReservationDTO;
 import com.makingscience.levelupproject.model.params.RatingParam;
-import com.makingscience.levelupproject.model.params.ReservationRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,10 +1,13 @@
 package com.makingscience.levelupproject.model.entities.postgre;
 
+import com.makingscience.levelupproject.model.details.request.ReservationRequestDetails;
 import com.makingscience.levelupproject.model.enums.WaitingStatus;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,6 +45,9 @@ public class WaitingList {
     @Enumerated(EnumType.STRING)
     private WaitingStatus waitingStatus;
 
-    private String waitingListDetails;
+
+    @Type(JsonType.class)
+    @Column(name = "details",columnDefinition = "jsonb")
+    private ReservationRequestDetails waitingListDetails;
 
 }

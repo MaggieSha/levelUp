@@ -1,11 +1,10 @@
-package com.makingscience.levelupproject.model;
+package com.makingscience.levelupproject.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.makingscience.levelupproject.model.entities.postgre.Merchant;
 import com.makingscience.levelupproject.model.enums.MerchantStatus;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 @Setter

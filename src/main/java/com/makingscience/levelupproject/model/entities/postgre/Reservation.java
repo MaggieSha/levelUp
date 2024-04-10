@@ -1,10 +1,15 @@
 package com.makingscience.levelupproject.model.entities.postgre;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.makingscience.levelupproject.model.details.reservation.ReservationDetails;
+import com.makingscience.levelupproject.model.details.reservation.RestaurantReservationDetails;
 import com.makingscience.levelupproject.model.enums.ReservationStatus;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,8 +35,11 @@ public class Reservation {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "reservation_day")
     private LocalDate reservationDay;
+
+    @JsonFormat(pattern = "HH:mm")
     @Column(name = "reservation_time")
     private LocalTime reservationTime;
 
@@ -43,5 +51,7 @@ public class Reservation {
     @Column(name = "update_time")
     private LocalDateTime updateTime;
 
-    private String reservationDetails;
+    @Type(JsonType.class)
+    @Column(name = "details",columnDefinition = "jsonb")
+    private ReservationDetails reservationDetails;
 }

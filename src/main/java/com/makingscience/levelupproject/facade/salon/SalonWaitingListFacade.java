@@ -1,14 +1,11 @@
-package com.makingscience.levelupproject.facade.restaurant;
+package com.makingscience.levelupproject.facade.salon;
 
 import com.makingscience.levelupproject.facade.interfaces.WaitingListFacade;
 import com.makingscience.levelupproject.model.WaitinListNotification;
 import com.makingscience.levelupproject.model.dto.WaitingListDTO;
-import com.makingscience.levelupproject.model.details.request.RestaurantReservationRequestDetails;
-import com.makingscience.levelupproject.model.details.slot.RestaurantSlotDetails;
-import com.makingscience.levelupproject.model.entities.postgre.Branch;
-import com.makingscience.levelupproject.model.entities.postgre.Slot;
-import com.makingscience.levelupproject.model.entities.postgre.User;
-import com.makingscience.levelupproject.model.entities.postgre.WaitingList;
+import com.makingscience.levelupproject.model.details.request.SalonReservationRequestDetails;
+import com.makingscience.levelupproject.model.details.slot.SalonSlotDetails;
+import com.makingscience.levelupproject.model.entities.postgre.*;
 import com.makingscience.levelupproject.model.enums.Type;
 import com.makingscience.levelupproject.model.enums.WaitingStatus;
 import com.makingscience.levelupproject.model.params.WaitingListRequest;
@@ -26,11 +23,11 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
 
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class RestaurantWaitingListFacade implements WaitingListFacade {
-
+public class SalonWaitingListFacade implements WaitingListFacade {
     public static final ZoneId ZONE_ID = ZoneId.of("Asia/Tbilisi");
     private final SlotService slotService;
     private final JwtUtils jwtUtils;
@@ -40,31 +37,27 @@ public class RestaurantWaitingListFacade implements WaitingListFacade {
 
     @Override
     public WaitingListDTO add(WaitingListRequest param) {
-        // todo: DAAMATE RO TU UKVE ELODEBA, MASHIN MEORED AGAR DAAAMTO BAZASHI
-            User authenticatedUser = jwtUtils.getAuthenticatedUser();
+        User authenticatedUser = jwtUtils.getAuthenticatedUser();
+
         Branch branch = branchService.getById(param.getBranchId());
 
-        RestaurantReservationRequestDetails requestDetails = (RestaurantReservationRequestDetails) param.getReservationRequestDetails();
-        List<Slot> slots = slotService.getAvailableSlotsForRestaurant(requestDetails.getNumberOfPeople(), param.getReservationDay(), param.getBranchId());
-        if (!slots.isEmpty())
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "No need for waiting! You can reserve now!");
+        SalonReservationRequestDetails requestDetails = (SalonReservationRequestDetails) param.getReservationRequestDetails();
 
+
+        List<Slot> slots = slotService.getAvailableSlotsForSalon(requestDetails.getServiceName(),requestDetails.getStylistName(),requestDetails.getPreferredTime(), param.getReservationDay(), param.getBranchId());
+        if(!slots.isEmpty()) throw new ResponseStatusException(HttpStatus.CONFLICT, "No need for waiting! You can reserve now!");
 
         slots = slotService.findByBranchId(param.getBranchId(), Pageable.unpaged()).getContent();
-
-
         int preferredSlotsNumber = 0;
         for (Slot slot : slots) {
-            RestaurantSlotDetails slotDetails = (RestaurantSlotDetails) slot.getSlotDetails();
+            SalonSlotDetails slotDetails = (SalonSlotDetails) slot.getSlotDetails();
 
 
-            if (requestDetails.getNumberOfPeople() > slotDetails.getTableCapacity() ||
-                    (requestDetails.getPreferredTime().isBefore(slotDetails.getReservationStartTime()) ||
-
-                            requestDetails.getPreferredTime().isAfter(slotDetails.getReservationEndTime()))) continue;
+            if (!requestDetails.getStylistName().equals(slotDetails.getStylistName())
+                    || !requestDetails.getPreferredTime().equals(slotDetails.getVisitHour())
+                    || !requestDetails.getServiceName().equals(slotDetails.getServiceName())) continue;
 
             preferredSlotsNumber++;
-
 
         }
         if (preferredSlotsNumber > 0) {
@@ -95,16 +88,16 @@ public class RestaurantWaitingListFacade implements WaitingListFacade {
             waitingListService.save(waitingList);
             return;
         }
+        SalonReservationRequestDetails requestDetails = (SalonReservationRequestDetails) waitingList.getWaitingListDetails();
 
-        RestaurantReservationRequestDetails requestDetails = (RestaurantReservationRequestDetails) waitingList.getWaitingListDetails();
-        List<Slot> slots = slotService.getAvailableSlotsForRestaurant(requestDetails.getNumberOfPeople(), waitingList.getPreferredDate(), waitingList.getBranch().getId());
+        List<Slot> slots = slotService.getAvailableSlotsForSalon(requestDetails.getServiceName(),requestDetails.getStylistName(),requestDetails.getPreferredTime(), waitingList.getPreferredDate(), waitingList.getBranch().getId());
+
         if (!slots.isEmpty()) {
             WaitinListNotification notification = createWaitingListNotification(waitingList);
             emailService.send(notification);
         }
 
     }
-
 
     private WaitinListNotification createWaitingListNotification(WaitingList waitingList) {
         WaitinListNotification notification = new WaitinListNotification();
@@ -117,6 +110,6 @@ public class RestaurantWaitingListFacade implements WaitingListFacade {
 
     @Override
     public Type getType() {
-        return Type.RESTAURANT;
+        return Type.SALON;
     }
 }

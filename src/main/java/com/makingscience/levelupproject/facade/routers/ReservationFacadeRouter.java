@@ -2,7 +2,7 @@ package com.makingscience.levelupproject.facade.routers;
 
 
 import com.makingscience.levelupproject.facade.interfaces.ReservationFacade;
-import com.makingscience.levelupproject.model.ReservationDTO;
+import com.makingscience.levelupproject.model.dto.ReservationDTO;
 import com.makingscience.levelupproject.model.details.reservation.ReservationDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Branch;
 import com.makingscience.levelupproject.model.entities.postgre.Reservation;
@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class ReservationFacadeRouter {
     private final List<ReservationFacade> reservationFacades;
     private final BranchService branchService;
-    private final SlotService slotService;
     private final ReservationService reservationService;
     private final JwtUtils jwtUtils;
     private final AcquiringTransactionService acquiringTransactionService;
@@ -40,12 +39,6 @@ public class ReservationFacadeRouter {
 
     }
 
-    private ReservationFacade chooseFacade(UUID branchId) {
-        Branch branch = branchService.getById(branchId);
-        return reservationFacades.stream().filter(reservationFacade -> reservationFacade.getType().name().equals(branch.getMerchant().getCategory().getName()))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not supported category type: " + branch.getMerchant().getCategory().getName()));
-    }
 
     public void cancel(Long id) {
         Reservation reservation = reservationService.getById(id);
@@ -129,5 +122,13 @@ public class ReservationFacadeRouter {
         Page<Reservation> reservations = reservationService.getByMerchantId(merchantId,pageable);
         List<ReservationDTO> dtos = reservations.getContent().stream().map(reservation -> ReservationDTO.of(reservation, null)).collect(Collectors.toList());
         return new PageImpl<>(dtos,pageable,reservations.getTotalElements());
+    }
+
+
+    private ReservationFacade chooseFacade(UUID branchId) {
+        Branch branch = branchService.getById(branchId);
+        return reservationFacades.stream().filter(reservationFacade -> reservationFacade.getType().name().equals(branch.getMerchant().getCategory().getName()))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not supported category type: " + branch.getMerchant().getCategory().getName()));
     }
 }
