@@ -1,10 +1,10 @@
-package com.makingscience.levelupproject.facade.salon;
+package com.makingscience.levelupproject.facade.visit;
 
 import com.makingscience.levelupproject.facade.interfaces.WaitingListFacade;
 import com.makingscience.levelupproject.model.WaitinListNotification;
 import com.makingscience.levelupproject.model.dto.WaitingListDTO;
-import com.makingscience.levelupproject.model.details.request.SalonReservationRequestDetails;
-import com.makingscience.levelupproject.model.details.slot.SalonSlotDetails;
+import com.makingscience.levelupproject.model.details.request.VisitReservationRequestDetails;
+import com.makingscience.levelupproject.model.details.slot.VisitSlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.*;
 import com.makingscience.levelupproject.model.enums.Type;
 import com.makingscience.levelupproject.model.enums.WaitingStatus;
@@ -27,7 +27,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SalonWaitingListFacade implements WaitingListFacade {
+public class VisitWaitingListFacade implements WaitingListFacade {
     public static final ZoneId ZONE_ID = ZoneId.of("Asia/Tbilisi");
     private final SlotService slotService;
     private final JwtUtils jwtUtils;
@@ -41,20 +41,19 @@ public class SalonWaitingListFacade implements WaitingListFacade {
 
         Branch branch = branchService.getById(param.getBranchId());
 
-        SalonReservationRequestDetails requestDetails = (SalonReservationRequestDetails) param.getReservationRequestDetails();
+        VisitReservationRequestDetails requestDetails = (VisitReservationRequestDetails) param.getReservationRequestDetails();
 
 
-        List<Slot> slots = slotService.getAvailableSlotsForSalon(requestDetails.getServiceName(),requestDetails.getStylistName(),requestDetails.getPreferredTime(), param.getReservationDay(), param.getBranchId());
+        List<Slot> slots = slotService.getAvailableSlotsForVisit(requestDetails.getServiceName(),requestDetails.getPreferredTime(), param.getReservationDay(), param.getBranchId());
         if(!slots.isEmpty()) throw new ResponseStatusException(HttpStatus.CONFLICT, "No need for waiting! You can reserve now!");
 
         slots = slotService.findByBranchId(param.getBranchId(), Pageable.unpaged()).getContent();
         int preferredSlotsNumber = 0;
         for (Slot slot : slots) {
-            SalonSlotDetails slotDetails = (SalonSlotDetails) slot.getSlotDetails();
+            VisitSlotDetails slotDetails = (VisitSlotDetails) slot.getSlotDetails();
 
 
-            if (!requestDetails.getStylistName().equals(slotDetails.getStylistName())
-                    || !requestDetails.getPreferredTime().equals(slotDetails.getVisitHour())
+            if (!requestDetails.getPreferredTime().equals(slotDetails.getVisitHour())
                     || !requestDetails.getServiceName().equals(slotDetails.getServiceName())) continue;
 
             preferredSlotsNumber++;
@@ -88,9 +87,9 @@ public class SalonWaitingListFacade implements WaitingListFacade {
             waitingListService.save(waitingList);
             return;
         }
-        SalonReservationRequestDetails requestDetails = (SalonReservationRequestDetails) waitingList.getWaitingListDetails();
+        VisitReservationRequestDetails requestDetails = (VisitReservationRequestDetails) waitingList.getWaitingListDetails();
 
-        List<Slot> slots = slotService.getAvailableSlotsForSalon(requestDetails.getServiceName(),requestDetails.getStylistName(),requestDetails.getPreferredTime(), waitingList.getPreferredDate(), waitingList.getBranch().getId());
+        List<Slot> slots = slotService.getAvailableSlotsForVisit(requestDetails.getServiceName(),requestDetails.getPreferredTime(), waitingList.getPreferredDate(), waitingList.getBranch().getId());
 
         if (!slots.isEmpty()) {
             WaitinListNotification notification = createWaitingListNotification(waitingList);
@@ -110,6 +109,6 @@ public class SalonWaitingListFacade implements WaitingListFacade {
 
     @Override
     public Type getType() {
-        return Type.SALON;
+        return Type.VISIT;
     }
 }

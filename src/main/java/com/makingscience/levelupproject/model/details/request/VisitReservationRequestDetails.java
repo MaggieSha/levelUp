@@ -1,7 +1,6 @@
 package com.makingscience.levelupproject.model.details.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.makingscience.levelupproject.model.enums.SalonService;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,14 +13,13 @@ import java.time.LocalTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SalonReservationRequestDetails extends ReservationRequestDetails{
+public class VisitReservationRequestDetails extends ReservationRequestDetails{
     @JsonFormat(pattern = "HH:mm")
     @NotNull(message = "preferredTime-is required!")
     private LocalTime preferredTime;
 
     @NotNull(message = "serviceName-is required!")
-    private SalonService serviceName;
+    private String serviceName;
 
-    @NotNull(message = "stylistName-is required!")
-    private String stylistName;
+
 }

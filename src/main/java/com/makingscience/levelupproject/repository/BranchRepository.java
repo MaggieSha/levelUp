@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public interface BranchRepository extends JpaRepository<Branch, UUID> {
 
-    @Query("select b from Branch  b where b.contactPhone = :contactPhone and b.merchant.id <> :merchantId and b.status = 'ACTIVE'")
-    Optional<Branch> getByContactPhoneAndMerchantId(String contactPhone, UUID merchantId);
+    @Query("select b from Branch  b where b.contactPhone = :contactPhone and b.status = 'ACTIVE'")
+    Optional<Branch> getByContactPhone(String contactPhone);
 
     Optional<Branch> findByIdAndStatus(UUID id, BranchStatus branchStatus);
 

@@ -1,6 +1,7 @@
 package com.makingscience.levelupproject.facade.routers;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.makingscience.levelupproject.facade.interfaces.SlotFacade;
 import com.makingscience.levelupproject.model.dto.SlotDTO;
 import com.makingscience.levelupproject.model.dto.SlotFilterDTO;
@@ -39,7 +40,7 @@ public class SlotFacadeRouter {
     private final BranchService branchService;
     private final SlotService slotService;
 
-    public SlotDTO add(CreateSlotParam param) {
+    public SlotDTO add(CreateSlotParam param) throws JsonProcessingException {
         return chooseFacade(param.getBranchId()).createSlot(param);
     }
 

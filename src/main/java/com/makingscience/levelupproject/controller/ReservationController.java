@@ -29,14 +29,14 @@ public class ReservationController {
 
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('USER')")
+//    @PreAuthorize("hasAnyAuthority('USER')")
     public ResponseEntity<ReservationDTO> makeReservation(@Valid @RequestBody ReservationRequest param) {
         ReservationDTO reservationDTO = reservationFacadeRouter.add(param);
         return ResponseEntity.ok(reservationDTO);
     }
 
     @PostMapping("/cancel/{id}")
-    @PreAuthorize("hasAnyAuthority('USER')")
+//    @PreAuthorize("hasAnyAuthority('USER')")
     public ResponseEntity<Void> cancelReservation(@PathVariable Long id) {
         reservationFacadeRouter.cancel(id);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -44,14 +44,14 @@ public class ReservationController {
 
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('USER')")
+//    @PreAuthorize("hasAnyAuthority('USER')")
     public ResponseEntity<Page<ReservationDTO>> getUserReservations(Pageable pageable) {
         Page<ReservationDTO> dtos = reservationFacadeRouter.getUserReservations(pageable);
         return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('USER')")
+//    @PreAuthorize("hasAnyAuthority('USER')")
     public ResponseEntity<ReservationDetails> getReservationDetails(@PathVariable Long id) {
         ReservationDetails reservationDetails = reservationFacadeRouter.getUserReservationDetails(id);
         return ResponseEntity.ok(reservationDetails);
@@ -59,7 +59,7 @@ public class ReservationController {
 
     // ADMIN ENDPOINTS
     @PutMapping()
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<Void> updateStatus(@RequestParam Long id, @RequestParam ReservationStatus status) {
         reservationFacadeRouter.updateStatus(id, status);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -67,21 +67,21 @@ public class ReservationController {
     }
 
     @GetMapping("/merchant")
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<Page<ReservationDTO>> getMerchantReservations(@RequestParam UUID merchantId, Pageable pageable) {
         Page<ReservationDTO> dtos = reservationFacadeRouter.getMerchantReservations(merchantId,pageable);
         return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/branch")
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<Page<ReservationDTO>> getBranchReservations(@RequestParam UUID branchId, Pageable pageable) {
         Page<ReservationDTO> dtos = reservationFacadeRouter.getBranchReservations(branchId,pageable);
         return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{id}/admin")
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<ReservationDetails> getReservationsDetailsById(@PathVariable Long id) {
         ReservationDetails details = reservationFacadeRouter.getReservationById(id);
         return ResponseEntity.ok(details);

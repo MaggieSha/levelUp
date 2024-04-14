@@ -2,6 +2,7 @@ package com.makingscience.levelupproject.facade.restaurant;
 
 
 import com.makingscience.levelupproject.facade.interfaces.ReservationFacade;
+import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.dto.ReservationDTO;
 import com.makingscience.levelupproject.model.details.request.RestaurantReservationRequestDetails;
 import com.makingscience.levelupproject.model.details.reservation.ReservationDetails;
@@ -32,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +57,11 @@ public class RestaurantReserveFacade implements ReservationFacade {
         validateParam(requestDetails);
 
         List<Slot> slots = slotService.getAvailableSlotsForRestaurant(requestDetails.getNumberOfPeople(), param.getReservationDay(), param.getBranchId());
+        slots =  slots.stream().filter(slot -> {
+            RestaurantSlotDetails slotDetails = (RestaurantSlotDetails) slot.getSlotDetails();
+            return !(slotDetails.getReservationEndTime().isBefore(requestDetails.getPreferredTime()) || slotDetails.getReservationStartTime().isAfter(requestDetails.getPreferredTime()));
+
+        }).collect(Collectors.toList());
 
         if (slots.isEmpty())
             throw new ResponseStatusException(HttpStatus.CONFLICT, "All slots with requested properties are already reserved!");
@@ -89,7 +96,7 @@ public class RestaurantReserveFacade implements ReservationFacade {
 
 
         LocalDateTime reservationTime = LocalDateTime.of(reservation.getReservationDay(), reservation.getReservationTime());
-        if (reservationTime.minusHours(slotDetails.getPaidCancelledHours()).isBefore(LocalDateTime.now(ZONE_ID))) {
+        if (reservationTime.minusHours(slotDetails.getPaidCancelledHours()).isAfter(LocalDateTime.now(ZONE_ID))) {
             acquiringTransactionService.refund(reservation.getId());
         } else {
             paymentTransactionService.pay(reservation.getId());

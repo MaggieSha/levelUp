@@ -1,7 +1,7 @@
 package com.makingscience.levelupproject.service;
 
+import com.makingscience.levelupproject.model.details.slot.VisitSlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
-import com.makingscience.levelupproject.model.enums.SalonService;
 import com.makingscience.levelupproject.model.enums.SlotStatus;
 import com.makingscience.levelupproject.repository.FilterQueryResponse;
 import com.makingscience.levelupproject.repository.SlotRepository;
@@ -31,6 +31,10 @@ public class SlotService {
     public Optional<Slot> findByExternalIdAndBranchId(String externalId, UUID branchId) {
         return slotRepository.findByExternalIdAndBranchId(externalId,branchId);
     }
+    public Optional<Slot> findByExternalIdAndBranchIdAndDetails(String externalId, UUID branchId, VisitSlotDetails slotDetails) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return slotRepository.findByExternalIdAndBranchIdAndDetails(externalId,branchId,slotDetails.getServiceName(),slotDetails.getVisitHour().format(formatter), String.valueOf(slotDetails.getPaidCancelledHours()));
+    }
 
     public Slot findById(Long id) {
         return slotRepository.findByIdAndSlotStatus(id, SlotStatus.ACTIVE).orElseThrow(()->
@@ -58,18 +62,18 @@ public class SlotService {
         return slotRepository.findByMerchantIdAndStatus(merchantId,SlotStatus.ACTIVE,pageable);
     }
 
-    public Page<FilterQueryResponse> filterForSalon(SalonService serviceName, String stylistName, LocalTime hour, LocalDate preferredDay, UUID branchId, Pageable pageable) {
+    public Page<FilterQueryResponse> filterForVisit(String serviceName, LocalTime hour, LocalDate preferredDay, UUID branchId, Pageable pageable) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        return slotRepository.filterForSalon(serviceName!=null ? serviceName.name() : null,stylistName,hour !=null ? hour.format(formatter) : null,preferredDay,branchId,pageable);
+        return slotRepository.filterForVisit(serviceName,hour !=null ? hour.format(formatter) : null,preferredDay,branchId,pageable);
     }
 
     public List<Slot> getAvailableSlotsForRestaurant(Integer numberOfPeople, LocalDate preferredDay, UUID branchId) {
         return slotRepository.getAvailableSlotsForRestaurant(numberOfPeople,preferredDay,branchId);
     }
 
-    public List<Slot> getAvailableSlotsForSalon(SalonService serviceName, String stylistName, LocalTime preferredTime, LocalDate reservationDay, UUID branchId) {
+    public List<Slot> getAvailableSlotsForVisit(String serviceName, LocalTime preferredTime, LocalDate reservationDay, UUID branchId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
-        return slotRepository.getAvailableSlotsForSalon(serviceName!=null ? serviceName.name() : null,stylistName,preferredTime.format(formatter),reservationDay,branchId);
+        return slotRepository.getAvailableSlotsForVisit(serviceName,preferredTime.format(formatter),reservationDay,branchId);
     }
 }

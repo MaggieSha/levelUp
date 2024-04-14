@@ -1,11 +1,6 @@
 package com.makingscience.levelupproject.model.params;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.makingscience.levelupproject.model.details.slot.RestaurantSlotDetails;
-import com.makingscience.levelupproject.model.details.slot.SalonSlotDetails;
 import com.makingscience.levelupproject.model.details.slot.SlotDetails;
-import com.makingscience.levelupproject.model.enums.Type;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -21,7 +16,7 @@ public class CreateSlotParam {
     private UUID branchId;
     @NotNull(message = "externalId-Is required")
     private String externalId;
-    @NotNull(message = "name-Is required")
+//    @NotNull(message = "name-Is required")
     private String name;
     @NotNull(message = "reserveFee-Is required")
     private Double reserveFee;

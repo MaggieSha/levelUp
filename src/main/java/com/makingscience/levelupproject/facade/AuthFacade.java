@@ -40,6 +40,8 @@ public class AuthFacade {
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
 
+
+
     public void sendSMS(SendOtpParam param) {
         OtpType smsType = param.getOtpType();
         String rawCode = randomCode();
@@ -72,8 +74,9 @@ public class AuthFacade {
         userOtpService.save(UserOtp.of(param, finalCode));
 
         System.out.println("Email service CODE = " + rawCode);
+        emailService.send(param.getEmail(),rawCode);
+        System.out.println(Thread.currentThread().getName());
 
-        emailService.send(param.getEmail(), rawCode);
     }
 
     @Transactional

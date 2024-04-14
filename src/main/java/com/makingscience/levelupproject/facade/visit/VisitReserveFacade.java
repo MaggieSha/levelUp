@@ -1,11 +1,11 @@
-package com.makingscience.levelupproject.facade.salon;
+package com.makingscience.levelupproject.facade.visit;
 
 import com.makingscience.levelupproject.facade.interfaces.ReservationFacade;
 import com.makingscience.levelupproject.model.dto.ReservationDTO;
-import com.makingscience.levelupproject.model.details.request.SalonReservationRequestDetails;
+import com.makingscience.levelupproject.model.details.request.VisitReservationRequestDetails;
 import com.makingscience.levelupproject.model.details.reservation.ReservationDetails;
-import com.makingscience.levelupproject.model.details.reservation.SalonReservationDetails;
-import com.makingscience.levelupproject.model.details.slot.SalonSlotDetails;
+import com.makingscience.levelupproject.model.details.reservation.VisitReservationDetails;
+import com.makingscience.levelupproject.model.details.slot.VisitSlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Reservation;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
 import com.makingscience.levelupproject.model.entities.postgre.User;
@@ -35,7 +35,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SalonReserveFacade implements ReservationFacade {
+public class VisitReserveFacade implements ReservationFacade {
     private final SlotService slotService;
     private final JwtUtils jwtUtils;
     private final ReservationService reservationService;
@@ -49,11 +49,11 @@ public class SalonReserveFacade implements ReservationFacade {
     public ReservationDTO add(ReservationRequest param) {
         User authenticatedUser = jwtUtils.getAuthenticatedUser();
 
-        SalonReservationRequestDetails requestDetails = (SalonReservationRequestDetails) param.getReservationRequestDetails();
+        VisitReservationRequestDetails requestDetails = (VisitReservationRequestDetails) param.getReservationRequestDetails();
 
         validateParam(requestDetails);
 
-        List<Slot> slots = slotService.getAvailableSlotsForSalon(requestDetails.getServiceName(),requestDetails.getStylistName(),requestDetails.getPreferredTime(), param.getReservationDay(), param.getBranchId());
+        List<Slot> slots = slotService.getAvailableSlotsForVisit(requestDetails.getServiceName(),requestDetails.getPreferredTime(), param.getReservationDay(), param.getBranchId());
 
 
         if (slots.isEmpty())
@@ -66,9 +66,8 @@ public class SalonReserveFacade implements ReservationFacade {
         reservation.setSlot(slots.get(0));
         reservation.setUser(authenticatedUser);
 
-        SalonReservationDetails reservationDetails = new SalonReservationDetails();
+        VisitReservationDetails reservationDetails = new VisitReservationDetails();
         reservationDetails.setServiceName(requestDetails.getServiceName());
-        reservationDetails.setStylistName(requestDetails.getStylistName());
 
         reservation.setReservationDetails(reservationDetails);
         reservationService.save(reservation);
@@ -86,11 +85,11 @@ public class SalonReserveFacade implements ReservationFacade {
         User authenticatedUser = jwtUtils.getAuthenticatedUser();
         Reservation reservation = reservationService.getByIdAndUser(reservationId, authenticatedUser.getId());
 
-        SalonSlotDetails slotDetails = (SalonSlotDetails) reservation.getSlot().getSlotDetails();
+        VisitSlotDetails slotDetails = (VisitSlotDetails) reservation.getSlot().getSlotDetails();
 
 
         LocalDateTime reservationTime = LocalDateTime.of(reservation.getReservationDay(), reservation.getReservationTime());
-        if (reservationTime.minusHours(slotDetails.getPaidCancelledHours()).isBefore(LocalDateTime.now(ZONE_ID))) {
+        if (reservationTime.minusHours(slotDetails.getPaidCancelledHours()).isAfter(LocalDateTime.now(ZONE_ID))) {
             acquiringTransactionService.refund(reservation.getId());
         } else {
             paymentTransactionService.pay(reservation.getId());
@@ -108,16 +107,16 @@ public class SalonReserveFacade implements ReservationFacade {
     }
     @Override
     public Type getType() {
-        return Type.SALON;
+        return Type.VISIT;
     }
 
-    private static void validateParam(SalonReservationRequestDetails requestDetails) {
+    private static void validateParam(VisitReservationRequestDetails requestDetails) {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         Validator validator = validatorFactory.getValidator();
-        Set<ConstraintViolation<SalonReservationRequestDetails>> violations = validator.validate(requestDetails);
+        Set<ConstraintViolation<VisitReservationRequestDetails>> violations = validator.validate(requestDetails);
         if (!violations.isEmpty()) {
             StringBuilder errorMessage = new StringBuilder();
-            for (ConstraintViolation<SalonReservationRequestDetails> v : violations) {
+            for (ConstraintViolation<VisitReservationRequestDetails> v : violations) {
                 errorMessage.append(v.getMessage()).append("; ");
             }
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage.toString());

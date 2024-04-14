@@ -18,8 +18,8 @@ import java.util.UUID;
 public class BranchService {
     private final BranchRepository branchRepository;
 
-    public Optional<Branch> getByContactPhoneAndMerchantId(String contactPhone, UUID merchantId) {
-        return branchRepository.getByContactPhoneAndMerchantId(contactPhone,merchantId);
+    public Optional<Branch> getByContactPhone(String contactPhone) {
+        return branchRepository.getByContactPhone(contactPhone);
     }
 
     public Branch save(Branch branch) {

@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +24,7 @@ public class AuthService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         userService.getByEmail(username)
-                .orElseThrow(() -> new NotFoundException("User with email " + username + " not found!"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User with email " + username + " not found!"));
 
 
         UserOtp userOtp = userOtpService.getByEmail(username).orElseThrow(

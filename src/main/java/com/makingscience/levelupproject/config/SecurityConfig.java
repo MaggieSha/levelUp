@@ -5,6 +5,8 @@ import com.makingscience.levelupproject.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -29,6 +31,8 @@ import java.util.Arrays;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 @Configuration
 @RequiredArgsConstructor
+@EnableAsync
+@EnableScheduling
 public class SecurityConfig {
 
     private final AuthService authService;

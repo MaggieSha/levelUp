@@ -37,7 +37,7 @@ public class AcquiringTransactionService {
         AcquiringTransaction transaction = acquiringTransactionRepository.getByReservationId(reservationId).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Acquiring transaction for reservation with id " + reservationId + " not found!"));
 
-        if (!transaction.getAcquiringTransactionStatus().equals(AcquiringTransactionStatus.REFUNDED))
+        if (transaction.getAcquiringTransactionStatus().equals(AcquiringTransactionStatus.REFUNDED))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Transaction with id " + transaction.getId() + "is already refunded!");
 
         transaction.setAcquiringTransactionStatus(AcquiringTransactionStatus.REFUNDED);

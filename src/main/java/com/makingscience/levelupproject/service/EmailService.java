@@ -23,6 +23,7 @@ public class EmailService {
 
     @Async
     public void send(String email, String otp) {
+        System.out.println(Thread.currentThread().getName());
         try {
             sendMail(email, otp);
         } catch (Exception e) {

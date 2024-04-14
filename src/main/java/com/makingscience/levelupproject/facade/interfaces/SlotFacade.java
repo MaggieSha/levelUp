@@ -1,5 +1,6 @@
 package com.makingscience.levelupproject.facade.interfaces;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.makingscience.levelupproject.model.dto.SlotDTO;
 import com.makingscience.levelupproject.model.details.slot.SlotDetails;
 import com.makingscience.levelupproject.model.entities.postgre.Slot;
@@ -13,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface SlotFacade {
 
-    SlotDTO createSlot(CreateSlotParam param);
+    SlotDTO createSlot(CreateSlotParam param) throws JsonProcessingException;
 
     SlotDTO updateSlot(Slot slot, UpdateSlotParam param);
 

@@ -27,7 +27,7 @@ public interface MerchantRepository extends JpaRepository<Merchant, UUID> {
 
     Page<Merchant> findAllByStatus(Pageable pageable,MerchantStatus status);
 
-    @Query("select new com.makingscience.levelupproject.model.MerchantDTO(m.id,m.name,m.category.id,m.category.name,m.email,m.phone,m.status,avg(r.rating) as rating) " +
-            "from Merchant m left join Review r on m.id = r.branch.merchant.id group by m.id,m.name,m.category,m.email,m.phone,m.status order by rating ")
+    @Query("select new com.makingscience.levelupproject.model.dto.MerchantDTO(m.id,m.name,m.category.id,m.category.name,m.email,m.phone,m.status,avg(r.rating)) " +
+            "from Merchant m left join Review r on m.id = r.branch.merchant.id group by m.id,m.name,m.category,m.email,m.phone,m.status order by avg(r.rating) ")
     Page<MerchantDTO> getAllMerchantByRating(Pageable pageable);
 }

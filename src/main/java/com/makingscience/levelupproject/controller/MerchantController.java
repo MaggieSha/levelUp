@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,28 +26,28 @@ public class MerchantController {
     private final MerchantFacade merchantFacade;
 
     @PostMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<MerchantDTO> createMerchant(@Valid @RequestBody CreateMerchantParam param) {
         MerchantDTO merchantDTO = merchantFacade.add(param);
         return ResponseEntity.ok(merchantDTO);
     }
 
     @PutMapping
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<MerchantDTO> updateMerchant(@Valid @RequestBody UpdateMerchantParam param) {
         MerchantDTO merchantDTO = merchantFacade.update(param);
         return ResponseEntity.ok(merchantDTO);
     }
 
     @DeleteMapping("/{id}")
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<Void> deleteMerchant(@Valid @PathVariable UUID id) {
         merchantFacade.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<MerchantDTO> getMerchantById(@Valid @PathVariable UUID id) {
         MerchantDTO merchantDTO   = merchantFacade.getById(id);
         return ResponseEntity.ok(merchantDTO);

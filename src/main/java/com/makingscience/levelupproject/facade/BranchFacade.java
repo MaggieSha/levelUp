@@ -67,7 +67,7 @@ public class BranchFacade {
 
         if (!param.getContactPhone().equals(branch.getContactPhone())) {
             Optional<Merchant> optionalMerchant = merchantService.getByPhone(param.getContactPhone());
-            Optional<Branch> optionalBranch = branchService.getByContactPhoneAndMerchantId(param.getContactPhone(), branch.getMerchant().getId());
+            Optional<Branch> optionalBranch = branchService.getByContactPhone(param.getContactPhone());
             Optional<User> optionalUser = userService.getByContactPhone(param.getContactPhone());
             if (optionalMerchant.isPresent() || optionalUser.isPresent() || optionalBranch.isPresent()) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "User,Merchant or Branch(of another merchant) already exists with contact phone: " + param.getContactPhone());
@@ -92,10 +92,10 @@ public class BranchFacade {
 
         if (!param.getContactPhone().equals(merchant.getPhone())) {
             Optional<Merchant> optionalMerchant = merchantService.getByPhone(param.getContactPhone());
-            Optional<Branch> optionalBranch = branchService.getByContactPhoneAndMerchantId(param.getContactPhone(), param.getMerchantId());
+            Optional<Branch> optionalBranch = branchService.getByContactPhone(param.getContactPhone());
             Optional<User> optionalUser = userService.getByContactPhone(param.getContactPhone());
             if (optionalMerchant.isPresent() || optionalUser.isPresent() || optionalBranch.isPresent()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "User,Merchant or Branch(of another merchant) already exists with contact phone: " + param.getContactPhone());
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "User,Merchant or Branch already exists with contact phone: " + param.getContactPhone());
             }
 
         }
